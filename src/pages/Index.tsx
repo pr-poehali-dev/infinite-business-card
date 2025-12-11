@@ -1,12 +1,56 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from 'react';
+import Hero from '@/components/Hero';
+import Pricing from '@/components/Pricing';
+import FAQ from '@/components/FAQ';
+import Dashboard from '@/components/Dashboard';
+import Footer from '@/components/Footer';
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
+  const [currentView, setCurrentView] = useState<'landing' | 'dashboard'>('landing');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+    setCurrentView('dashboard');
+  };
+
+  if (currentView === 'dashboard' && isLoggedIn) {
+    return <Dashboard onLogout={() => { setIsLoggedIn(false); setCurrentView('landing'); }} />;
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4 color-black text-black">Добро пожаловать!</h1>
-        <p className="text-xl text-gray-600">тут будет отображаться ваш проект</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <header className="fixed top-0 w-full bg-background/80 backdrop-blur-lg border-b border-border z-50">
+        <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="text-2xl font-bold">
+              <span className="text-gold">∞7</span>
+              <span className="ml-2">visitka.site</span>
+            </div>
+          </div>
+          <div className="hidden md:flex items-center gap-8">
+            <a href="#features" className="hover:text-gold transition-colors">Возможности</a>
+            <a href="#pricing" className="hover:text-gold transition-colors">Тарифы</a>
+            <a href="#faq" className="hover:text-gold transition-colors">FAQ</a>
+            <a href="#contacts" className="hover:text-gold transition-colors">Контакты</a>
+          </div>
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" onClick={handleLogin}>Войти</Button>
+            <Button className="bg-gold text-black hover:bg-gold/90" onClick={handleLogin}>
+              Регистрация
+            </Button>
+          </div>
+        </nav>
+      </header>
+
+      <main className="pt-20">
+        <Hero onGetStarted={handleLogin} />
+        <Pricing onSelectPlan={handleLogin} />
+        <FAQ />
+      </main>
+
+      <Footer />
     </div>
   );
 };
