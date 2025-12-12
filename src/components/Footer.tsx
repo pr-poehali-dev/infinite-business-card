@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import Icon from '@/components/ui/icon';
+import PrivacyPolicy from './PrivacyPolicy';
 
 const Footer = () => {
+  const [privacyOpen, setPrivacyOpen] = useState(false);
   return (
     <footer className="bg-secondary text-white py-12 border-t border-gold/20">
       <div className="container mx-auto px-4">
@@ -29,7 +32,22 @@ const Footer = () => {
             <ul className="space-y-2 text-sm text-gray-400">
               <li><a href="#about" className="hover:text-gold transition-colors">О нас</a></li>
               <li><a href="#contacts" className="hover:text-gold transition-colors">Контакты</a></li>
-              <li><a href="#privacy" className="hover:text-gold transition-colors">Политика конфиденциальности</a></li>
+              <li>
+                <button 
+                  onClick={() => setPrivacyOpen(true)} 
+                  className="hover:text-gold transition-colors text-left"
+                >
+                  Политика конфиденциальности
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => setPrivacyOpen(true)} 
+                  className="hover:text-gold transition-colors text-left"
+                >
+                  Обработка персональных данных
+                </button>
+              </li>
             </ul>
           </div>
 
@@ -53,6 +71,8 @@ const Footer = () => {
           <p>&copy; 2024 visitka.site. Все права защищены.</p>
         </div>
       </div>
+      
+      <PrivacyPolicy open={privacyOpen} onOpenChange={setPrivacyOpen} />
     </footer>
   );
 };

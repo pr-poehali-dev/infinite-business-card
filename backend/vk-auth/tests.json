@@ -1,0 +1,26 @@
+{
+  "tests": [
+    {
+      "name": "Get VK auth URL",
+      "method": "GET",
+      "path": "/?redirect_uri=https://visitka.site/auth/vk",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "auth_url": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Handle missing code in callback",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "redirect_uri": "https://visitka.site/auth/vk"
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "Authorization code required"
+      }
+    }
+  ]
+}

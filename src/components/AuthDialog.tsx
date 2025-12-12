@@ -67,6 +67,22 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
     }
   };
 
+  const handleVKAuth = async () => {
+    try {
+      const response = await fetch('https://functions.poehali.dev/74d0ac96-7cc9-4254-86f4-508ca9a70f55?redirect_uri=' + encodeURIComponent(window.location.origin + '/auth/vk'));
+      const data = await response.json();
+      if (data.auth_url) {
+        window.location.href = data.auth_url;
+      }
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось подключиться к VK',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -176,6 +192,29 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
                 )}
               </Button>
             </form>
+            
+            <div className="mt-4">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    Или войти через
+                  </span>
+                </div>
+              </div>
+              
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full mt-4"
+                onClick={handleVKAuth}
+              >
+                <Icon name="User" className="mr-2" size={18} />
+                Войти через ВКонтакте
+              </Button>
+            </div>
           </TabsContent>
         </Tabs>
       </DialogContent>

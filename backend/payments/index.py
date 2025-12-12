@@ -65,6 +65,26 @@ def handler(event, context):
             auth_string = f"{shop_id}:{secret_key}"
             auth_bytes = base64.b64encode(auth_string.encode()).decode()
             
+            payment_data = {
+                'amount': {
+                    'value': str(amount),
+                    'currency': 'RUB'
+                },
+                'confirmation': {
+                    'type': 'redirect',
+                    'return_url': body.get('return_url', 'https://visitka.site/dashboard')
+                },
+                'capture': True,
+                'description': f'{payment_type} payment',
+                'payment_method_data': {
+                    'type': 'bank_card'
+                }
+            }
+            
+            payment_methods = body.get('payment_methods', ['bank_card', 'sbp', 'yoo_money'])
+            if 'mir' in payment_methods or 'bank_card' in payment_methods:
+                payment_data['payment_method_data'] = {'type': 'bank_card'}
+            
             yukassa_response = requests.post(
                 'https://api.yookassa.ru/v3/payments',
                 headers={
@@ -72,18 +92,7 @@ def handler(event, context):
                     'Idempotence-Key': idempotence_key,
                     'Content-Type': 'application/json'
                 },
-                json={
-                    'amount': {
-                        'value': str(amount),
-                        'currency': 'RUB'
-                    },
-                    'confirmation': {
-                        'type': 'redirect',
-                        'return_url': body.get('return_url', 'https://visitka.site/dashboard')
-                    },
-                    'capture': True,
-                    'description': f'{payment_type} payment'
-                }
+                json=payment_data
             )
             
             yukassa_data = yukassa_response.json()
