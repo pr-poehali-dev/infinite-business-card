@@ -1,5 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
+import ReputationStats from '../ReputationStats';
 
 const AnalyticsTab = () => {
   const stats = {
@@ -23,8 +25,20 @@ const AnalyticsTab = () => {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <Tabs defaultValue="visits" className="space-y-6">
+      <TabsList className="grid w-full grid-cols-2 max-w-md">
+        <TabsTrigger value="visits">
+          <Icon name="Eye" className="mr-2" size={16} />
+          Просмотры
+        </TabsTrigger>
+        <TabsTrigger value="reputation">
+          <Icon name="Star" className="mr-2" size={16} />
+          Репутация
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="visits" className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="border-gold/20">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -113,7 +127,12 @@ const AnalyticsTab = () => {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </TabsContent>
+
+      <TabsContent value="reputation" className="space-y-6">
+        <ReputationStats />
+      </TabsContent>
+    </Tabs>
   );
 };
 

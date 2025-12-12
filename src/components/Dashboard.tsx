@@ -11,6 +11,7 @@ import ReferralTab from './dashboard/ReferralTab';
 import TemplatesTab from './dashboard/TemplatesTab';
 import IntegrationsTab from './dashboard/IntegrationsTab';
 import TeamManagementTab from './dashboard/TeamManagementTab';
+import Reviews from './Reviews';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -52,7 +53,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         </div>
 
         <Tabs defaultValue="card" className="space-y-6">
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 w-full">
+          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 w-full">
             <TabsTrigger value="card">
               <Icon name="CreditCard" className="mr-2" size={18} />
               <span className="hidden sm:inline">Визитка</span>
@@ -80,6 +81,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
             <TabsTrigger value="team">
               <Icon name="Users" className="mr-2" size={18} />
               <span className="hidden sm:inline">Команда</span>
+            </TabsTrigger>
+            <TabsTrigger value="reviews">
+              <Icon name="Star" className="mr-2" size={18} />
+              <span className="hidden sm:inline">Отзывы</span>
             </TabsTrigger>
             <TabsTrigger value="referral">
               <Icon name="Gift" className="mr-2" size={18} />
@@ -113,6 +118,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
           <TabsContent value="team" className="space-y-6">
             <TeamManagementTab />
+          </TabsContent>
+
+          <TabsContent value="reviews" className="space-y-6">
+            <Reviews />
           </TabsContent>
 
           <TabsContent value="referral" className="space-y-6">
