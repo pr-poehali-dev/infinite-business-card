@@ -8,6 +8,9 @@ import EditTab from './dashboard/EditTab';
 import DesignTab from './dashboard/DesignTab';
 import AnalyticsTab from './dashboard/AnalyticsTab';
 import ReferralTab from './dashboard/ReferralTab';
+import TemplatesTab from './dashboard/TemplatesTab';
+import IntegrationsTab from './dashboard/IntegrationsTab';
+import TeamManagementTab from './dashboard/TeamManagementTab';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -49,26 +52,38 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         </div>
 
         <Tabs defaultValue="card" className="space-y-6">
-          <TabsList className="grid grid-cols-2 md:grid-cols-5 w-full">
+          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 w-full">
             <TabsTrigger value="card">
               <Icon name="CreditCard" className="mr-2" size={18} />
-              Визитка
+              <span className="hidden sm:inline">Визитка</span>
             </TabsTrigger>
             <TabsTrigger value="edit">
               <Icon name="Edit" className="mr-2" size={18} />
-              Редактировать
+              <span className="hidden sm:inline">Редактировать</span>
+            </TabsTrigger>
+            <TabsTrigger value="templates">
+              <Icon name="LayoutTemplate" className="mr-2" size={18} />
+              <span className="hidden sm:inline">Шаблоны</span>
             </TabsTrigger>
             <TabsTrigger value="design">
               <Icon name="Palette" className="mr-2" size={18} />
-              Дизайн
+              <span className="hidden sm:inline">Дизайн</span>
             </TabsTrigger>
             <TabsTrigger value="analytics">
               <Icon name="BarChart" className="mr-2" size={18} />
-              Аналитика
+              <span className="hidden sm:inline">Аналитика</span>
+            </TabsTrigger>
+            <TabsTrigger value="integrations">
+              <Icon name="Plug" className="mr-2" size={18} />
+              <span className="hidden sm:inline">Интеграции</span>
+            </TabsTrigger>
+            <TabsTrigger value="team">
+              <Icon name="Users" className="mr-2" size={18} />
+              <span className="hidden sm:inline">Команда</span>
             </TabsTrigger>
             <TabsTrigger value="referral">
-              <Icon name="Users" className="mr-2" size={18} />
-              Реферал
+              <Icon name="Gift" className="mr-2" size={18} />
+              <span className="hidden sm:inline">Реферал</span>
             </TabsTrigger>
           </TabsList>
 
@@ -86,6 +101,18 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
           <TabsContent value="analytics" className="space-y-6">
             <AnalyticsTab />
+          </TabsContent>
+
+          <TabsContent value="templates" className="space-y-6">
+            <TemplatesTab onApplyTemplate={(template) => alert(`Применён шаблон: ${template.name}`)} />
+          </TabsContent>
+
+          <TabsContent value="integrations" className="space-y-6">
+            <IntegrationsTab />
+          </TabsContent>
+
+          <TabsContent value="team" className="space-y-6">
+            <TeamManagementTab />
           </TabsContent>
 
           <TabsContent value="referral" className="space-y-6">

@@ -40,19 +40,36 @@ const Pricing = ({ onSelectPlan }: PricingProps) => {
       popular: true
     },
     {
-      name: 'Корпоративный',
-      price: '970',
+      name: 'Бизнес',
+      price: '1990',
       period: 'в год',
-      description: 'Пакет для команды из 20 сотрудников',
+      description: 'Для команд до 10 человек',
       features: [
         'Всё из Премиум',
-        '20 регистраций сотрудников',
-        'Единый дизайн компании',
-        'Корпоративные макеты',
+        '10 визиток сотрудников',
+        'Единый корп. стиль',
+        'Командная панель управления',
         'Аналитика по команде',
-        'Персональный менеджер'
+        'Приоритетная поддержка'
       ],
-      cta: 'Оформить для команды',
+      cta: 'Для команды',
+      popular: false
+    },
+    {
+      name: 'Корпоративный',
+      price: 'от 9990',
+      period: 'в год',
+      description: 'Для компаний от 50 сотрудников',
+      features: [
+        'Всё из Бизнес',
+        'Безлимитное кол-во визиток',
+        'Интеграция с Active Directory',
+        'API для автоматизации',
+        'Единая аналитика компании',
+        'Персональный менеджер',
+        'SLA 99.9%'
+      ],
+      cta: 'Связаться с нами',
       popular: false
     }
   ];
@@ -70,7 +87,7 @@ const Pricing = ({ onSelectPlan }: PricingProps) => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {plans.map((plan, index) => (
             <Card 
               key={index}

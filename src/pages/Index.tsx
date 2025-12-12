@@ -5,6 +5,7 @@ import FAQ from '@/components/FAQ';
 import Dashboard from '@/components/Dashboard';
 import Footer from '@/components/Footer';
 import AuthDialog from '@/components/AuthDialog';
+import HelpCenter from '@/components/HelpCenter';
 import { Button } from '@/components/ui/button';
 import { api } from '@/lib/api';
 
@@ -52,6 +53,7 @@ const Index = () => {
           <div className="hidden md:flex items-center gap-8">
             <a href="#features" className="hover:text-gold transition-colors">Возможности</a>
             <a href="#pricing" className="hover:text-gold transition-colors">Тарифы</a>
+            <a href="#help" className="hover:text-gold transition-colors">Обучение</a>
             <a href="#faq" className="hover:text-gold transition-colors">FAQ</a>
             <a href="#contacts" className="hover:text-gold transition-colors">Контакты</a>
           </div>
@@ -67,6 +69,7 @@ const Index = () => {
       <main className="pt-20">
         <Hero onGetStarted={handleOpenAuth} />
         <Pricing onSelectPlan={handleOpenAuth} />
+        <HelpCenter />
         <FAQ />
       </main>
 
