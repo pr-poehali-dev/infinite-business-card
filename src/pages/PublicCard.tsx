@@ -3,8 +3,11 @@ import { useParams } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
 import { Helmet } from 'react-helmet-async';
+import { toast } from 'sonner';
 
 interface CardData {
   id: number;
@@ -24,6 +27,9 @@ const PublicCard = () => {
   const [card, setCard] = useState<CardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showLeadForm, setShowLeadForm] = useState(false);
+  const [leadForm, setLeadForm] = useState({ name: '', email: '', phone: '', message: '' });
+  const [submittingLead, setSubmittingLead] = useState(false);
 
   useEffect(() => {
     const fetchCard = async () => {
@@ -85,7 +91,41 @@ const PublicCard = () => {
       }
     } else {
       await navigator.clipboard.writeText(url);
-      alert('Ссылка скопирована в буфер обмена!');
+      toast.success('Ссылка скопирована!');
+    }
+  };
+
+  const handleSubmitLead = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!leadForm.name || (!leadForm.email && !leadForm.phone)) {
+      toast.error('Укажите имя и хотя бы один контакт');
+      return;
+    }
+
+    setSubmittingLead(true);
+    try {
+      const response = await fetch('https://functions.poehali.dev/fab78694-2899-42fa-b327-8aad2ebfa9bb', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          card_id: card?.id,
+          ...leadForm,
+          source: 'direct'
+        })
+      });
+
+      if (response.ok) {
+        toast.success('Спасибо! Ваша заявка отправлена');
+        setLeadForm({ name: '', email: '', phone: '', message: '' });
+        setShowLeadForm(false);
+      } else {
+        throw new Error('Failed to submit');
+      }
+    } catch (error) {
+      toast.error('Ошибка отправки. Попробуйте ещё раз');
+    } finally {
+      setSubmittingLead(false);
     }
   };
 
@@ -225,6 +265,96 @@ const PublicCard = () => {
               </Button>
             </div>
           </Card>
+
+          {/* Lead Form */}
+          {!showLeadForm ? (
+            <Card className="overflow-hidden border-2 border-gold/20 shadow-xl mt-6">
+              <div className="bg-gradient-to-r from-gold/10 to-gold/5 p-6 text-center">
+                <Icon name="MessageSquare" size={40} className="mx-auto mb-3 text-gold" />
+                <h3 className="text-xl font-bold mb-2">Есть вопросы?</h3>
+                <p className="text-muted-foreground mb-4">Оставьте свои контакты, и мы свяжемся с вами</p>
+                <Button
+                  onClick={() => setShowLeadForm(true)}
+                  className="bg-gold text-black hover:bg-gold/90 font-semibold"
+                >
+                  <Icon name="Edit" className="mr-2" size={18} />
+                  Оставить заявку
+                </Button>
+              </div>
+            </Card>
+          ) : (
+            <Card className="overflow-hidden border-2 border-gold/20 shadow-xl mt-6">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold flex items-center gap-2">
+                    <Icon name="MessageSquare" size={24} className="text-gold" />
+                    Оставить заявку
+                  </h3>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowLeadForm(false)}
+                  >
+                    <Icon name="X" size={20} />
+                  </Button>
+                </div>
+                
+                <form onSubmit={handleSubmitLead} className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Имя *</label>
+                    <Input
+                      value={leadForm.name}
+                      onChange={(e) => setLeadForm({...leadForm, name: e.target.value})}
+                      placeholder="Ваше имя"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Email</label>
+                    <Input
+                      type="email"
+                      value={leadForm.email}
+                      onChange={(e) => setLeadForm({...leadForm, email: e.target.value})}
+                      placeholder="example@mail.com"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Телефон</label>
+                    <Input
+                      type="tel"
+                      value={leadForm.phone}
+                      onChange={(e) => setLeadForm({...leadForm, phone: e.target.value})}
+                      placeholder="+7 (999) 123-45-67"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Сообщение</label>
+                    <Textarea
+                      value={leadForm.message}
+                      onChange={(e) => setLeadForm({...leadForm, message: e.target.value})}
+                      placeholder="Расскажите о вашем вопросе..."
+                      rows={4}
+                    />
+                  </div>
+                  
+                  <p className="text-xs text-muted-foreground">
+                    * Укажите хотя бы один контакт: email или телефон
+                  </p>
+                  
+                  <Button
+                    type="submit"
+                    className="w-full bg-gold text-black hover:bg-gold/90 font-semibold"
+                    disabled={submittingLead}
+                  >
+                    {submittingLead ? 'Отправка...' : 'Отправить заявку'}
+                  </Button>
+                </form>
+              </div>
+            </Card>
+          )}
 
           {/* Footer CTA */}
           <div className="mt-8 text-center">

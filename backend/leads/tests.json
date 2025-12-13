@@ -1,0 +1,25 @@
+{
+  "tests": [
+    {
+      "name": "Create new lead",
+      "method": "POST",
+      "body": {
+        "card_id": 1,
+        "name": "Иван Тестовый",
+        "email": "test@example.com",
+        "phone": "+7 999 123-45-67",
+        "message": "Хочу узнать подробнее о ваших услугах",
+        "source": "direct"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "lead": {
+          "name": "string",
+          "email": "string"
+        }
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

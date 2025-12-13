@@ -12,6 +12,7 @@ import TemplatesTab from './dashboard/TemplatesTab';
 import IntegrationsTab from './dashboard/IntegrationsTab';
 import TeamManagementTab from './dashboard/TeamManagementTab';
 import PortfolioTab from './dashboard/PortfolioTab';
+import LeadsTab from './dashboard/LeadsTab';
 import Reviews from './Reviews';
 
 interface DashboardProps {
@@ -54,7 +55,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         </div>
 
         <Tabs defaultValue="card" className="space-y-6">
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-10 w-full">
+          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-11 w-full">
             <TabsTrigger value="card">
               <Icon name="CreditCard" className="mr-2" size={18} />
               <span className="hidden sm:inline">Визитка</span>
@@ -82,6 +83,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
             <TabsTrigger value="team">
               <Icon name="Users" className="mr-2" size={18} />
               <span className="hidden sm:inline">Команда</span>
+            </TabsTrigger>
+            <TabsTrigger value="leads">
+              <Icon name="Inbox" className="mr-2" size={18} />
+              <span className="hidden sm:inline">Лиды</span>
             </TabsTrigger>
             <TabsTrigger value="portfolio">
               <Icon name="Briefcase" className="mr-2" size={18} />
@@ -123,6 +128,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
           <TabsContent value="team" className="space-y-6">
             <TeamManagementTab />
+          </TabsContent>
+
+          <TabsContent value="leads" className="space-y-6">
+            <LeadsTab />
           </TabsContent>
 
           <TabsContent value="portfolio" className="space-y-6">
