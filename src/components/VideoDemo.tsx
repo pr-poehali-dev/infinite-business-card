@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { Badge } from '@/components/ui/badge';
+import Quiz from './Quiz';
 
 interface VideoDemoProps {
   open: boolean;
@@ -11,6 +12,7 @@ interface VideoDemoProps {
 
 const VideoDemo = ({ open, onOpenChange }: VideoDemoProps) => {
   const [currentVideo, setCurrentVideo] = useState(0);
+  const [showQuiz, setShowQuiz] = useState(false);
 
   const videos = [
     {
@@ -154,8 +156,35 @@ const VideoDemo = ({ open, onOpenChange }: VideoDemoProps) => {
               <Icon name="ChevronRight" className="ml-2" size={18} />
             </Button>
           </div>
+
+          <div className="bg-gradient-to-br from-green/10 to-blue/10 border border-green/20 rounded-xl p-6">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green to-blue flex items-center justify-center flex-shrink-0">
+                <Icon name="Brain" size={24} className="text-white" />
+              </div>
+              <div className="flex-1">
+                <h4 className="font-semibold mb-2">Проверьте свои знания</h4>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Пройдите короткий тест по материалу видео и получите обратную связь
+                </p>
+                <Button 
+                  onClick={() => setShowQuiz(true)}
+                  className="w-full sm:w-auto"
+                >
+                  <Icon name="GraduationCap" className="mr-2" size={18} />
+                  Начать тест
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
       </DialogContent>
+
+      <Quiz 
+        open={showQuiz} 
+        onOpenChange={setShowQuiz}
+        videoTitle={currentVideoData.title}
+      />
     </Dialog>
   );
 };
