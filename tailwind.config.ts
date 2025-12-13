@@ -79,16 +79,18 @@ export default {
 				purple: {
 					DEFAULT: '#8b5cf6',
 					light: '#a78bfa',
-					dark: '#6d28d9',
+					dark: '#7c3aed',
 					500: '#8b5cf6',
-					600: '#7c3aed'
+					600: '#7c3aed',
+					700: '#6d28d9'
 				},
 				cyan: {
 					DEFAULT: '#06b6d4',
 					light: '#22d3ee',
 					dark: '#0891b2',
 					500: '#06b6d4',
-					600: '#0891b2'
+					600: '#0891b2',
+					700: '#0e7490'
 				},
 				orange: {
 					DEFAULT: '#ff6b35',

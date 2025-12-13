@@ -40,8 +40,8 @@
     --blue-dark: 217 33% 17%;
     --blue-darker: 220 40% 12%;
     --navy: 220 50% 18%;
-    --purple: 271 81% 56%;
-    --cyan: 175 70% 50%;
+    --purple: 271 76% 60%;
+    --cyan: 189 94% 43%;
     --teal: 175 70% 50%;
     --orange: 25 95% 53%;
 
@@ -95,8 +95,8 @@
     --blue-dark: 217 33% 17%;
     --blue-darker: 220 40% 12%;
     --navy: 220 50% 18%;
-    --purple: 271 81% 56%;
-    --cyan: 175 70% 50%;
+    --purple: 271 76% 60%;
+    --cyan: 189 94% 43%;
     --teal: 175 70% 50%;
     --orange: 25 95% 53%;
     --sidebar-background: 217 33% 17%;
@@ -187,34 +187,38 @@
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, #3b82f6 0%, #41b6a8 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .gradient-bg {
-    background: linear-gradient(135deg, #2a4a6f 0%, #41b6a8 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   }
 
   .gradient-border {
-    border-image: linear-gradient(135deg, #2a4a6f 0%, #41b6a8 100%) 1;
+    border-image: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) 1;
   }
 
   .gradient-blue-purple {
-    background: linear-gradient(135deg, #1a2332 0%, #2a4a6f 100%);
+    background: linear-gradient(135deg, #1e3a5f 0%, #8b5cf6 100%);
   }
 
   .gradient-cyan-blue {
-    background: linear-gradient(135deg, #2a4a6f 0%, #41b6a8 100%);
+    background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
   }
 
   .gradient-corporate {
-    background: linear-gradient(135deg, #1a2332 0%, #2a4a6f 50%, #1e3a5f 100%);
+    background: linear-gradient(135deg, #1a2332 0%, #1e3a5f 50%, #3b82f6 100%);
   }
 
   .gradient-navy-teal {
     background: linear-gradient(135deg, #2a4a6f 0%, #41b6a8 100%);
+  }
+
+  .gradient-blue-purple-teal {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #41b6a8 100%);
   }
 
   .glass-effect {
