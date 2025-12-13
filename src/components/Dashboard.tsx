@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +16,12 @@ import PortfolioTab from './dashboard/PortfolioTab';
 import LeadsTab from './dashboard/LeadsTab';
 import Reviews from './Reviews';
 import AnalyticsDashboard from './AnalyticsDashboard';
+import OnboardingFlow from './OnboardingFlow';
+import DemoTour from './DemoTour';
+import VideoDemo from './VideoDemo';
+import WelcomeNotification from './WelcomeNotification';
+import HelpButton from './HelpButton';
+import ProgressTracker from './ProgressTracker';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -33,6 +39,27 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
   });
 
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showTour, setShowTour] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
+
+  useEffect(() => {
+    const onboardingCompleted = localStorage.getItem('onboarding_completed');
+    if (!onboardingCompleted) {
+      setShowOnboarding(true);
+    }
+  }, []);
+
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    const choice = localStorage.getItem('onboarding_choice');
+    
+    if (choice === 'tour') {
+      setTimeout(() => setShowTour(true), 500);
+    } else if (choice === 'video') {
+      setTimeout(() => setShowVideo(true), 500);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -40,15 +67,11 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Logo size="md" />
           <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="hover:text-blue"
-              onClick={() => setAnalyticsOpen(true)}
-            >
-              <Icon name="BarChart3" className="mr-2" size={18} />
-              Аналитика тестов
-            </Button>
+            <HelpButton 
+              onStartTour={() => setShowTour(true)}
+              onWatchVideo={() => setShowVideo(true)}
+              onViewAnalytics={() => setAnalyticsOpen(true)}
+            />
             <Badge variant="outline" className="border-green text-green font-semibold">Базовый тариф</Badge>
             <Button variant="ghost" className="hover:text-green" onClick={onLogout}>
               <Icon name="LogOut" className="mr-2" size={18} />
@@ -65,6 +88,8 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
           <h1 className="text-3xl font-bold mb-2 gradient-text">Личный кабинет</h1>
           <p className="text-muted-foreground">Управляйте своей цифровой визиткой</p>
         </div>
+
+        <ProgressTracker userInfo={userInfo} />
 
         <Tabs defaultValue="card" className="space-y-6">
           <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-11 w-full">
@@ -159,6 +184,29 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
           </TabsContent>
         </Tabs>
       </main>
+
+      <OnboardingFlow 
+        open={showOnboarding} 
+        onComplete={handleOnboardingComplete}
+        userName={userInfo.name.split(' ')[0]}
+      />
+
+      <DemoTour 
+        open={showTour} 
+        onOpenChange={setShowTour}
+        plan="basic"
+        onComplete={() => setShowTour(false)}
+      />
+
+      <VideoDemo 
+        open={showVideo} 
+        onOpenChange={setShowVideo}
+      />
+
+      <WelcomeNotification 
+        userName={userInfo.name.split(' ')[0]}
+        onStartTour={() => setShowTour(true)}
+      />
     </div>
   );
 };
