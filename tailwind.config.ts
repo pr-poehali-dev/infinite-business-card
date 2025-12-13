@@ -64,16 +64,24 @@ export default {
 				},
 				gold: 'hsl(var(--gold))',
 				blue: {
-					500: '#3b82f6',
-					600: '#2563eb'
+					DEFAULT: '#1e3a8a',
+					500: '#1e3a8a',
+					600: '#1e40af'
 				},
 				purple: {
-					500: '#8b5cf6',
-					600: '#7c3aed'
+					DEFAULT: '#7c3aed',
+					500: '#7c3aed',
+					600: '#6d28d9'
+				},
+				pink: {
+					DEFAULT: '#ec4899',
+					500: '#ec4899',
+					600: '#db2777'
 				},
 				cyan: {
-					500: '#06b6d4',
-					600: '#0891b2'
+					DEFAULT: '#14b8a6',
+					500: '#14b8a6',
+					600: '#0d9488'
 				}
 			},
 			borderRadius: {

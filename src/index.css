@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Open+Sans:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Roboto:wght@300;400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -15,17 +15,17 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 217 91% 60%;
+    --primary: 221 83% 53%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 271 81% 56%;
+    --secondary: 282 83% 67%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
 
-    --accent: 189 94% 43%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 181 70% 55%;
+    --accent-foreground: 222 47% 11%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
@@ -35,7 +35,7 @@
     --ring: 217 91% 60%;
 
     --radius: 0.75rem;
-    --gold: 189 94% 43%;
+    --gold: 181 70% 55%;
 
     --sidebar-background: 0 0% 98%;
 
@@ -64,16 +64,16 @@
     --popover: 217 33% 17%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 217 91% 60%;
+    --primary: 221 83% 53%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 271 81% 56%;
+    --secondary: 282 83% 67%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 215 28% 17%;
     --muted-foreground: 217 11% 65%;
 
-    --accent: 189 94% 43%;
+    --accent: 181 70% 55%;
     --accent-foreground: 222 47% 11%;
 
     --destructive: 0 62.8% 30.6%;
@@ -82,7 +82,7 @@
     --border: 215 28% 17%;
     --input: 215 28% 17%;
     --ring: 217 91% 60%;
-    --gold: 189 94% 43%;
+    --gold: 181 70% 55%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -101,7 +101,7 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: "Open Sans", sans-serif;
+    font-family: "Roboto", sans-serif;
   }
 
   h1,
@@ -148,18 +148,19 @@
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 50%, #ec4899 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .gradient-bg {
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 50%, #ec4899 100%);
   }
 
   .gradient-border {
-    border-image: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) 1;
+    border-image: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 50%, #ec4899 100%)
+      1;
   }
 
   .glass-effect {
