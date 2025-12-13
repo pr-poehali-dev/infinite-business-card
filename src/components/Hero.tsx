@@ -25,13 +25,17 @@ const Hero = ({ onGetStarted, onStartDemo }: HeroProps) => {
             </div>
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-[1.1] tracking-tight">
-            Профессиональные визитки
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-[1.1] tracking-tight">
+            Стань кем хочешь
             <br />
-            <span className="gradient-text">для роста бизнеса</span>
+            <span className="gradient-text">с партнёром visitka.site</span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-white/80 mb-12 max-w-3xl mx-auto font-light leading-relaxed">
+          <p className="text-xl md:text-2xl text-white/80 mb-4 max-w-3xl mx-auto font-light leading-relaxed">
+            Профессиональные визитки для роста бизнеса
+          </p>
+          
+          <p className="text-base md:text-lg text-white/60 mb-12 max-w-2xl mx-auto">
             Экспертное решение для предпринимателей, агентств и корпораций. QR-коды, аналитика, интеграции и автоматизация.
           </p>
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +15,7 @@ import TeamManagementTab from './dashboard/TeamManagementTab';
 import PortfolioTab from './dashboard/PortfolioTab';
 import LeadsTab from './dashboard/LeadsTab';
 import Reviews from './Reviews';
+import DemoTour from './DemoTour';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface DemoDashboardProps {
@@ -23,6 +24,17 @@ interface DemoDashboardProps {
 }
 
 const DemoDashboard = ({ onExit, plan }: DemoDashboardProps) => {
+  const [showTour, setShowTour] = useState(false);
+  const [tourCompleted, setTourCompleted] = useState(false);
+
+  useEffect(() => {
+    setShowTour(true);
+  }, []);
+
+  const handleTourComplete = () => {
+    setTourCompleted(true);
+  };
+
   const [userInfo, setUserInfo] = useState({
     name: 'Демо Пользователь',
     position: 'Тестовая должность',
@@ -75,6 +87,10 @@ const DemoDashboard = ({ onExit, plan }: DemoDashboardProps) => {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Logo size="md" />
           <div className="flex items-center gap-4">
+            <Button variant="ghost" size="sm" className="hover:text-blue" onClick={() => setShowTour(true)}>
+              <Icon name="HelpCircle" className="mr-2" size={16} />
+              Повторить тур
+            </Button>
             <Badge variant="outline" className="border-orange text-orange font-semibold">
               <Icon name="Eye" className="mr-1" size={14} />
               Демо: {currentPlan.name}
@@ -191,6 +207,13 @@ const DemoDashboard = ({ onExit, plan }: DemoDashboardProps) => {
           </TabsContent>
         </Tabs>
       </main>
+
+      <DemoTour
+        open={showTour}
+        onOpenChange={setShowTour}
+        plan={plan}
+        onComplete={handleTourComplete}
+      />
     </div>
   );
 };
