@@ -1,27 +1,57 @@
+import { useEffect, useState } from 'react';
+
 interface LogoProps {
-  variant?: 'default' | 'white' | 'dark';
+  variant?: 'default' | 'light' | 'dark';
   size?: 'sm' | 'md' | 'lg';
-  showText?: boolean;
+  animated?: boolean;
   className?: string;
 }
 
-const Logo = ({ variant = 'default', size = 'md', showText = true, className = '' }: LogoProps) => {
+const Logo = ({ variant = 'default', size = 'md', animated = true, className = '' }: LogoProps) => {
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    if (variant === 'default') {
+      const checkTheme = () => {
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        setIsDark(isDarkMode);
+      };
+
+      checkTheme();
+      const observer = new MutationObserver(checkTheme);
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class']
+      });
+
+      return () => observer.disconnect();
+    }
+  }, [variant]);
+
   const sizeClasses = {
     sm: 'h-8 w-auto',
-    md: 'h-10 w-auto',
-    lg: 'h-16 w-auto'
+    md: 'h-12 w-auto',
+    lg: 'h-20 w-auto'
   };
 
-  const imgSrc = variant === 'white' 
-    ? 'https://cdn.poehali.dev/files/photo_5323474829841207821_y.jpg'
-    : 'https://cdn.poehali.dev/files/photo_5323474829841207535_y.jpg';
+  const getImgSrc = () => {
+    if (variant === 'light') {
+      return 'https://cdn.poehali.dev/files/photo_5323474829841207821_y.jpg';
+    }
+    if (variant === 'dark') {
+      return 'https://cdn.poehali.dev/files/photo_5323474829841207535_y.jpg';
+    }
+    return isDark
+      ? 'https://cdn.poehali.dev/files/photo_5323474829841207535_y.jpg'
+      : 'https://cdn.poehali.dev/files/photo_5323474829841207821_y.jpg';
+  };
 
   return (
     <div className={`flex items-center ${className}`}>
       <img 
-        src={imgSrc}
+        src={getImgSrc()}
         alt="visitka.site"
-        className={sizeClasses[size]}
+        className={`${sizeClasses[size]} ${animated ? 'transition-all duration-300 hover:scale-105' : ''}`}
       />
     </div>
   );
