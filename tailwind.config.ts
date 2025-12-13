@@ -63,6 +63,8 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				gold: 'hsl(var(--gold))',
+				teal: 'hsl(var(--teal))',
+				navy: 'hsl(var(--navy))',
 				blue: {
 					DEFAULT: '#3b82f6',
 					light: '#60a5fa',
