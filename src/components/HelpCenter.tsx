@@ -1,9 +1,13 @@
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import VideoDemo from './VideoDemo';
 
 const HelpCenter = () => {
+  const [videoDemoOpen, setVideoDemoOpen] = useState(false);
   const guides = {
     beginners: [
       {
@@ -197,9 +201,17 @@ const HelpCenter = () => {
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
             Обучающие материалы
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-6">
             Всё, что нужно знать для эффективного использования визиток
           </p>
+          <Button 
+            onClick={() => setVideoDemoOpen(true)}
+            className="gradient-bg text-white shadow-lg hover:opacity-90"
+            size="lg"
+          >
+            <Icon name="PlayCircle" className="mr-2" size={20} />
+            Смотреть видео-инструкции
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-16">
@@ -315,6 +327,8 @@ const HelpCenter = () => {
           </CardContent>
         </Card>
       </div>
+
+      <VideoDemo open={videoDemoOpen} onOpenChange={setVideoDemoOpen} />
     </section>
   );
 };
