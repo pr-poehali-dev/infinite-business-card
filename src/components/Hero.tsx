@@ -8,11 +8,11 @@ interface HeroProps {
 const Hero = ({ onGetStarted }: HeroProps) => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
-      <div className="absolute inset-0 gradient-blue-purple opacity-90"></div>
+      <div className="absolute inset-0 gradient-corporate opacity-95"></div>
       
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-teal/30 rounded-full blur-3xl opacity-25 animate-pulse"></div>
-        <div className="absolute bottom-1/3 right-1/3 w-[500px] h-[500px] bg-purple/20 rounded-full blur-3xl opacity-30 animate-pulse"></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green/20 rounded-full blur-3xl opacity-30 animate-pulse"></div>
+        <div className="absolute bottom-1/3 right-1/3 w-[500px] h-[500px] bg-blue-light/20 rounded-full blur-3xl opacity-30 animate-pulse"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue/10 rounded-full blur-3xl opacity-20"></div>
       </div>
 
@@ -37,7 +37,7 @@ const Hero = ({ onGetStarted }: HeroProps) => {
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-20">
             <Button 
               size="lg" 
-              className="gradient-bg text-white hover:opacity-90 text-lg px-10 py-7 rounded-xl font-semibold shadow-2xl shadow-purple/30 transition-all duration-300 hover:scale-105 hover:shadow-purple/50"
+              className="gradient-bg text-white hover:opacity-90 text-lg px-10 py-7 rounded-xl font-semibold shadow-2xl shadow-blue/30 transition-all duration-300 hover:scale-105 hover:shadow-green/50"
               onClick={onGetStarted}
             >
               Создать визитку
@@ -46,7 +46,7 @@ const Hero = ({ onGetStarted }: HeroProps) => {
             <Button 
               size="lg" 
               variant="outline" 
-              className="border-2 border-teal/60 text-white hover:bg-teal/10 hover:border-teal text-lg px-10 py-7 rounded-xl backdrop-blur-sm transition-all duration-300"
+              className="border-2 border-orange/80 text-white hover:bg-orange/10 hover:border-orange text-lg px-10 py-7 rounded-xl backdrop-blur-sm transition-all duration-300"
               onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
             >
               Смотреть тарифы
@@ -54,8 +54,8 @@ const Hero = ({ onGetStarted }: HeroProps) => {
           </div>
 
           <div id="features" className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-24">
-            <div className="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 transition-all duration-300 hover:bg-white/10 hover:border-teal/50 hover:scale-105 hover:shadow-xl hover:shadow-teal/20">
-              <div className="w-14 h-14 bg-teal rounded-xl flex items-center justify-center mb-5 mx-auto shadow-lg shadow-teal/30 group-hover:scale-110 transition-transform duration-300">
+            <div className="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 transition-all duration-300 hover:bg-white/10 hover:border-green/50 hover:scale-105 hover:shadow-xl hover:shadow-green/20">
+              <div className="w-14 h-14 bg-green rounded-xl flex items-center justify-center mb-5 mx-auto shadow-lg shadow-green/30 group-hover:scale-110 transition-transform duration-300">
                 <Icon name="Smartphone" className="text-white" size={28} />
               </div>
               <h3 className="text-xl font-semibold text-white mb-3">QR-код с контактами</h3>
@@ -64,8 +64,8 @@ const Hero = ({ onGetStarted }: HeroProps) => {
               </p>
             </div>
 
-            <div className="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 transition-all duration-300 hover:bg-white/10 hover:border-purple/50 hover:scale-105 hover:shadow-xl hover:shadow-purple/20">
-              <div className="w-14 h-14 gradient-bg rounded-xl flex items-center justify-center mb-5 mx-auto shadow-lg shadow-purple/30 group-hover:scale-110 transition-transform duration-300">
+            <div className="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 transition-all duration-300 hover:bg-white/10 hover:border-blue/50 hover:scale-105 hover:shadow-xl hover:shadow-blue/20">
+              <div className="w-14 h-14 gradient-bg rounded-xl flex items-center justify-center mb-5 mx-auto shadow-lg shadow-blue/30 group-hover:scale-110 transition-transform duration-300">
                 <Icon name="Share2" className="text-white" size={28} />
               </div>
               <h3 className="text-xl font-semibold text-white mb-3">Аналитика просмотров</h3>
@@ -74,8 +74,8 @@ const Hero = ({ onGetStarted }: HeroProps) => {
               </p>
             </div>
 
-            <div className="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 transition-all duration-300 hover:bg-white/10 hover:border-cyan/50 hover:scale-105 hover:shadow-xl hover:shadow-cyan/20">
-              <div className="w-14 h-14 bg-cyan rounded-xl flex items-center justify-center mb-5 mx-auto shadow-lg shadow-cyan/30 group-hover:scale-110 transition-transform duration-300">
+            <div className="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 transition-all duration-300 hover:bg-white/10 hover:border-orange/50 hover:scale-105 hover:shadow-xl hover:shadow-orange/20">
+              <div className="w-14 h-14 gradient-accent rounded-xl flex items-center justify-center mb-5 mx-auto shadow-lg shadow-orange/30 group-hover:scale-110 transition-transform duration-300">
                 <Icon name="Sparkles" className="text-white" size={28} />
               </div>
               <h3 className="text-xl font-semibold text-white mb-3">AI-генерация макетов</h3>

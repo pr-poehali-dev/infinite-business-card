@@ -7,25 +7,25 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 217 33% 17%;
+    --foreground: 0 0% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 217 33% 17%;
+    --card-foreground: 0 0% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 217 33% 17%;
+    --popover-foreground: 0 0% 20%;
 
-    --primary: 217 91% 60%;
+    --primary: 207 90% 54%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 271 76% 53%;
+    --secondary: 122 39% 49%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 220 14% 96%;
     --muted-foreground: 220 9% 46%;
 
-    --accent: 217 91% 60%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 45 100% 51%;
+    --accent-foreground: 0 0% 20%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
@@ -35,15 +35,16 @@
     --ring: 189 94% 43%;
 
     --radius: 0.75rem;
-    --gold: 175 70% 50%;
-    --blue: 217 91% 60%;
-    --blue-dark: 217 33% 17%;
-    --blue-darker: 220 40% 12%;
-    --navy: 220 50% 18%;
-    --purple: 271 76% 60%;
+    --gold: 45 100% 51%;
+    --blue: 207 90% 54%;
+    --blue-dark: 207 90% 40%;
+    --blue-darker: 207 90% 30%;
+    --navy: 207 50% 25%;
+    --purple: 271 81% 56%;
     --cyan: 189 94% 43%;
     --teal: 175 70% 50%;
-    --orange: 25 95% 53%;
+    --green: 122 39% 49%;
+    --orange: 45 100% 51%;
 
     --sidebar-background: 0 0% 98%;
 
@@ -72,33 +73,34 @@
     --popover: 217 33% 13%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 217 91% 60%;
+    --primary: 207 90% 54%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 215 25% 27%;
+    --secondary: 122 39% 49%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 215 25% 20%;
     --muted-foreground: 220 9% 65%;
 
-    --accent: 217 91% 60%;
-    --accent-foreground: 220 40% 12%;
+    --accent: 45 100% 51%;
+    --accent-foreground: 0 0% 20%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 215 25% 20%;
     --input: 215 25% 20%;
-    --ring: 175 70% 50%;
-    --gold: 175 70% 50%;
-    --blue: 217 91% 60%;
-    --blue-dark: 217 33% 17%;
-    --blue-darker: 220 40% 12%;
-    --navy: 220 50% 18%;
-    --purple: 271 76% 60%;
+    --ring: 45 100% 51%;
+    --gold: 45 100% 51%;
+    --blue: 207 90% 54%;
+    --blue-dark: 207 90% 40%;
+    --blue-darker: 207 90% 30%;
+    --navy: 207 50% 25%;
+    --purple: 271 81% 56%;
     --cyan: 189 94% 43%;
     --teal: 175 70% 50%;
-    --orange: 25 95% 53%;
+    --green: 122 39% 49%;
+    --orange: 45 100% 51%;
     --sidebar-background: 217 33% 17%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 217 91% 60%;
@@ -187,38 +189,42 @@
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, #2196f3 0%, #4caf50 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .gradient-bg {
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, #2196f3 0%, #4caf50 100%);
   }
 
   .gradient-border {
-    border-image: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) 1;
+    border-image: linear-gradient(135deg, #2196f3 0%, #4caf50 100%) 1;
+  }
+
+  .gradient-blue-green {
+    background: linear-gradient(135deg, #1976d2 0%, #388e3c 100%);
   }
 
   .gradient-blue-purple {
-    background: linear-gradient(135deg, #1e3a5f 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
   }
 
   .gradient-cyan-blue {
-    background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+    background: linear-gradient(135deg, #06b6d4 0%, #2196f3 100%);
   }
 
   .gradient-corporate {
-    background: linear-gradient(135deg, #1a2332 0%, #1e3a5f 50%, #3b82f6 100%);
+    background: linear-gradient(135deg, #0d47a1 0%, #1976d2 50%, #2196f3 100%);
   }
 
   .gradient-navy-teal {
-    background: linear-gradient(135deg, #2a4a6f 0%, #41b6a8 100%);
+    background: linear-gradient(135deg, #1976d2 0%, #4caf50 100%);
   }
 
-  .gradient-blue-purple-teal {
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #41b6a8 100%);
+  .gradient-accent {
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
   }
 
   .glass-effect {

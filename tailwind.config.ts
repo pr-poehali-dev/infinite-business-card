@@ -66,15 +66,23 @@ export default {
 				teal: 'hsl(var(--teal))',
 				navy: 'hsl(var(--navy))',
 				blue: {
-					DEFAULT: '#3b82f6',
-					light: '#60a5fa',
-					dark: '#1e3a5f',
-					darker: '#1a2332',
-					500: '#3b82f6',
-					600: '#2563eb',
-					700: '#1e40af',
-					800: '#1e3a5f',
-					900: '#1a2332'
+					DEFAULT: '#2196F3',
+					light: '#64B5F6',
+					dark: '#1976D2',
+					darker: '#0D47A1',
+					500: '#2196F3',
+					600: '#1E88E5',
+					700: '#1976D2',
+					800: '#1565C0',
+					900: '#0D47A1'
+				},
+				green: {
+					DEFAULT: '#4CAF50',
+					light: '#81C784',
+					dark: '#388E3C',
+					500: '#4CAF50',
+					600: '#43A047',
+					700: '#388E3C'
 				},
 				purple: {
 					DEFAULT: '#8b5cf6',
