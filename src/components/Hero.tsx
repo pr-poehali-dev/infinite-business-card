@@ -7,79 +7,79 @@ interface HeroProps {
 
 const Hero = ({ onGetStarted }: HeroProps) => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-secondary to-black"></div>
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
+      <div className="absolute inset-0 gradient-blue-purple opacity-90"></div>
       
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gold rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gold rounded-full blur-3xl animate-pulse delay-1000"></div>
+      <div className="absolute inset-0">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan rounded-full blur-3xl opacity-20 animate-pulse"></div>
+        <div className="absolute bottom-1/3 right-1/3 w-[500px] h-[500px] bg-purple rounded-full blur-3xl opacity-20 animate-pulse"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue rounded-full blur-3xl opacity-10"></div>
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-4xl mx-auto text-center animate-fade-in">
+        <div className="max-w-5xl mx-auto text-center animate-fade-in">
           <div className="inline-flex items-center justify-center mb-8">
-            <div className="text-8xl md:text-9xl font-bold text-gold mb-4 relative">
-              <div className="absolute inset-0 blur-2xl bg-gold opacity-50"></div>
+            <div className="text-8xl md:text-9xl font-bold gradient-text mb-4 relative animate-shimmer">
               <span className="relative">∞7</span>
             </div>
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 leading-[1.1] tracking-tight">
             Бесконечные возможности
             <br />
-            <span className="text-gold">вашей визитки</span>
+            <span className="gradient-text">вашей визитки</span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-2xl mx-auto">
+          <p className="text-xl md:text-2xl text-white/80 mb-12 max-w-3xl mx-auto font-light leading-relaxed">
             Создайте премиальную цифровую визитку с QR-кодом, аналитикой и реферальной программой за минуты
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-20">
             <Button 
               size="lg" 
-              className="bg-gold text-black hover:bg-gold/90 text-lg px-8 py-6 hover-scale"
+              className="gradient-bg text-white hover:opacity-90 text-lg px-10 py-7 rounded-xl font-semibold shadow-2xl shadow-cyan/30 transition-all duration-300 hover:scale-105 hover:shadow-cyan/50"
               onClick={onGetStarted}
             >
               Создать визитку
-              <Icon name="ArrowRight" className="ml-2" size={20} />
+              <Icon name="ArrowRight" className="ml-2" size={22} />
             </Button>
             <Button 
               size="lg" 
               variant="outline" 
-              className="border-gold text-gold hover:bg-gold/10 text-lg px-8 py-6"
+              className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 text-lg px-10 py-7 rounded-xl backdrop-blur-sm transition-all duration-300"
               onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
             >
               Смотреть тарифы
             </Button>
           </div>
 
-          <div id="features" className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-24">
-            <div className="bg-card/50 backdrop-blur-sm border border-gold/20 rounded-lg p-6 hover-scale">
-              <div className="w-12 h-12 bg-gold/10 rounded-lg flex items-center justify-center mb-4 mx-auto">
-                <Icon name="Smartphone" className="text-gold" size={24} />
+          <div id="features" className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-24">
+            <div className="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 transition-all duration-300 hover:bg-white/10 hover:border-cyan/50 hover:scale-105 hover:shadow-xl hover:shadow-cyan/20">
+              <div className="w-14 h-14 gradient-cyan-blue rounded-xl flex items-center justify-center mb-5 mx-auto shadow-lg shadow-cyan/30 group-hover:scale-110 transition-transform duration-300">
+                <Icon name="Smartphone" className="text-white" size={28} />
               </div>
               <h3 className="text-xl font-semibold text-white mb-3">QR-код с контактами</h3>
-              <p className="text-gray-400">
+              <p className="text-white/70 leading-relaxed">
                 Мгновенное добавление в телефонную книгу через QR
               </p>
             </div>
 
-            <div className="bg-card/50 backdrop-blur-sm border border-gold/20 rounded-lg p-6 hover-scale">
-              <div className="w-12 h-12 bg-gold/10 rounded-lg flex items-center justify-center mb-4 mx-auto">
-                <Icon name="Share2" className="text-gold" size={24} />
+            <div className="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 transition-all duration-300 hover:bg-white/10 hover:border-purple/50 hover:scale-105 hover:shadow-xl hover:shadow-purple/20">
+              <div className="w-14 h-14 gradient-blue-purple rounded-xl flex items-center justify-center mb-5 mx-auto shadow-lg shadow-purple/30 group-hover:scale-110 transition-transform duration-300">
+                <Icon name="Share2" className="text-white" size={28} />
               </div>
               <h3 className="text-xl font-semibold text-white mb-3">Аналитика просмотров</h3>
-              <p className="text-gray-400">
+              <p className="text-white/70 leading-relaxed">
                 Отслеживайте кто и откуда смотрит вашу визитку
               </p>
             </div>
 
-            <div className="bg-card/50 backdrop-blur-sm border border-gold/20 rounded-lg p-6 hover-scale">
-              <div className="w-12 h-12 bg-gold/10 rounded-lg flex items-center justify-center mb-4 mx-auto">
-                <Icon name="Sparkles" className="text-gold" size={24} />
+            <div className="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 transition-all duration-300 hover:bg-white/10 hover:border-cyan/50 hover:scale-105 hover:shadow-xl hover:shadow-cyan/20">
+              <div className="w-14 h-14 gradient-bg rounded-xl flex items-center justify-center mb-5 mx-auto shadow-lg shadow-blue/30 group-hover:scale-110 transition-transform duration-300">
+                <Icon name="Sparkles" className="text-white" size={28} />
               </div>
               <h3 className="text-xl font-semibold text-white mb-3">AI-генерация макетов</h3>
-              <p className="text-gray-400">
+              <p className="text-white/70 leading-relaxed">
                 Создавайте уникальные изображения и логотипы с ИИ
               </p>
             </div>
