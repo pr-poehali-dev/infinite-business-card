@@ -64,24 +64,44 @@ export default {
 				},
 				gold: 'hsl(var(--gold))',
 				blue: {
-					DEFAULT: '#1e3a8a',
-					500: '#1e3a8a',
-					600: '#1e40af'
+					DEFAULT: '#3b82f6',
+					light: '#60a5fa',
+					dark: '#1e40af',
+					500: '#3b82f6',
+					600: '#2563eb'
 				},
 				purple: {
-					DEFAULT: '#7c3aed',
-					500: '#7c3aed',
-					600: '#6d28d9'
-				},
-				pink: {
-					DEFAULT: '#ec4899',
-					500: '#ec4899',
-					600: '#db2777'
+					DEFAULT: '#8b5cf6',
+					light: '#a78bfa',
+					dark: '#6d28d9',
+					500: '#8b5cf6',
+					600: '#7c3aed'
 				},
 				cyan: {
-					DEFAULT: '#14b8a6',
-					500: '#14b8a6',
-					600: '#0d9488'
+					DEFAULT: '#06b6d4',
+					light: '#22d3ee',
+					dark: '#0891b2',
+					500: '#06b6d4',
+					600: '#0891b2'
+				},
+				orange: {
+					DEFAULT: '#ff6b35',
+					light: '#ff8c5a',
+					dark: '#e85a2a',
+					500: '#ff6b35',
+					600: '#e85a2a'
+				},
+				gray: {
+					50: '#f8fafc',
+					100: '#f1f5f9',
+					200: '#e2e8f0',
+					300: '#cbd5e1',
+					400: '#94a3b8',
+					500: '#64748b',
+					600: '#475569',
+					700: '#334155',
+					800: '#1e293b',
+					900: '#0f172a'
 				}
 			},
 			borderRadius: {

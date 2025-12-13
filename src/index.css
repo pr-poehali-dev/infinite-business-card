@@ -7,35 +7,39 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    --foreground: 217 19% 27%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 217 19% 27%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 217 19% 27%;
 
-    --primary: 221 83% 53%;
+    --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 282 83% 67%;
+    --secondary: 271 81% 56%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 181 70% 55%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 189 94% 43%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: 217 91% 60%;
+    --ring: 189 94% 43%;
 
     --radius: 0.75rem;
-    --gold: 181 70% 55%;
+    --gold: 189 94% 43%;
+    --blue: 217 91% 60%;
+    --purple: 271 81% 56%;
+    --cyan: 189 94% 43%;
+    --orange: 25 95% 53%;
 
     --sidebar-background: 0 0% 98%;
 
@@ -55,7 +59,7 @@
   }
 
   .dark {
-    --background: 222 47% 11%;
+    --background: 217 33% 10%;
     --foreground: 210 40% 98%;
 
     --card: 217 33% 17%;
@@ -64,25 +68,29 @@
     --popover: 217 33% 17%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 221 83% 53%;
+    --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 282 83% 67%;
+    --secondary: 271 81% 56%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 215 28% 17%;
     --muted-foreground: 217 11% 65%;
 
-    --accent: 181 70% 55%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 189 94% 43%;
+    --accent-foreground: 217 33% 10%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 215 28% 17%;
     --input: 215 28% 17%;
-    --ring: 217 91% 60%;
-    --gold: 181 70% 55%;
+    --ring: 189 94% 43%;
+    --gold: 189 94% 43%;
+    --blue: 217 91% 60%;
+    --purple: 271 81% 56%;
+    --cyan: 189 94% 43%;
+    --orange: 25 95% 53%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -148,19 +156,27 @@
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 50%, #ec4899 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 50%, #8b5cf6 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .gradient-bg {
-    background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 50%, #ec4899 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 50%, #8b5cf6 100%);
   }
 
   .gradient-border {
-    border-image: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 50%, #ec4899 100%)
+    border-image: linear-gradient(135deg, #3b82f6 0%, #06b6d4 50%, #8b5cf6 100%)
       1;
+  }
+
+  .gradient-blue-purple {
+    background: linear-gradient(135deg, #1e40af 0%, #8b5cf6 100%);
+  }
+
+  .gradient-cyan-blue {
+    background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
   }
 
   .glass-effect {
