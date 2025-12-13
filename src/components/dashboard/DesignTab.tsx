@@ -16,7 +16,46 @@ const DesignTab = () => {
   ];
 
   const handleApplyTheme = () => {
-    alert(`Тема "${themes.find(t => t.id === selectedTheme)?.name}" применена!`);
+    const theme = themes.find(t => t.id === selectedTheme);
+    if (!theme) return;
+
+    const root = document.documentElement;
+    
+    // Apply theme based on selection
+    switch(selectedTheme) {
+      case 'modern':
+        root.style.setProperty('--gold', '14 100% 57%'); // Cyan
+        root.style.setProperty('--background', '222 47% 11%'); // Dark slate
+        root.style.setProperty('--foreground', '210 40% 98%');
+        break;
+      case 'minimal':
+        root.style.setProperty('--gold', '0 0% 45%'); // Gray
+        root.style.setProperty('--background', '0 0% 100%'); // White
+        root.style.setProperty('--foreground', '0 0% 9%');
+        break;
+      case 'gradient':
+        root.style.setProperty('--gold', '340 82% 52%'); // Pink
+        root.style.setProperty('--background', '262 83% 58%'); // Purple
+        root.style.setProperty('--foreground', '0 0% 98%');
+        break;
+      case 'dark':
+        root.style.setProperty('--gold', '240 5% 65%'); // Zinc
+        root.style.setProperty('--background', '240 10% 4%'); // Zinc-950
+        root.style.setProperty('--foreground', '0 0% 98%');
+        break;
+      case 'elegant':
+        root.style.setProperty('--gold', '38 92% 50%'); // Amber
+        root.style.setProperty('--background', '4 56% 28%'); // Rose-900
+        root.style.setProperty('--foreground', '60 9% 98%');
+        break;
+      default: // classic
+        root.style.setProperty('--gold', '46 100% 50%');
+        root.style.setProperty('--background', '0 0% 0%');
+        root.style.setProperty('--foreground', '0 0% 98%');
+    }
+    
+    localStorage.setItem('selectedTheme', selectedTheme);
+    alert(`Тема "${theme.name}" применена! Обновите страницу для полного эффекта.`);
   };
 
   return (

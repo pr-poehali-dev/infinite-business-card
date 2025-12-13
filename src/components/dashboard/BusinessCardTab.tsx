@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
@@ -17,16 +18,55 @@ interface BusinessCardTabProps {
 }
 
 const BusinessCardTab = ({ userInfo }: BusinessCardTabProps) => {
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
+  const [cardId] = useState(1); // TODO: Get from API
+  const [isGeneratingQR, setIsGeneratingQR] = useState(false);
+  const publicCardUrl = `${window.location.origin}/card/${cardId}`;
+
+  useEffect(() => {
+    generateQRCode();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const generateQRCode = async () => {
+    setIsGeneratingQR(true);
+    try {
+      const response = await fetch('https://functions.poehali.dev/3abdccdf-8038-4ea9-a4bb-3302f15b8cf4', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          card_id: cardId,
+          url: publicCardUrl
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setQrCodeUrl(data.qr_url);
+      }
+    } catch (error) {
+      console.error('Failed to generate QR code:', error);
+    } finally {
+      setIsGeneratingQR(false);
+    }
+  };
+
   const messengers = [
-    { name: 'Telegram', icon: 'Send', color: 'text-blue-500', url: `https://t.me/share/url?url=${encodeURIComponent(window.location.origin)}&text=${encodeURIComponent(`Моя визитка: ${userInfo.name}`)}` },
-    { name: 'WhatsApp', icon: 'MessageCircle', color: 'text-green-500', url: `https://wa.me/?text=${encodeURIComponent(`Моя визитка: ${userInfo.name} ${window.location.origin}`)}` },
-    { name: 'VK', icon: 'Share2', color: 'text-blue-600', url: `https://vk.com/share.php?url=${encodeURIComponent(window.location.origin)}&title=${encodeURIComponent(userInfo.name)}` },
-    { name: 'Одноклассники', icon: 'Users', color: 'text-orange-500', url: `https://connect.ok.ru/offer?url=${encodeURIComponent(window.location.origin)}&title=${encodeURIComponent(userInfo.name)}` },
-    { name: 'VK Мессенджер', icon: 'MessageSquare', color: 'text-blue-500', url: `https://vk.me/share?url=${encodeURIComponent(window.location.origin)}&title=${encodeURIComponent(`Моя визитка: ${userInfo.name}`)}` },
+    { name: 'Telegram', icon: 'Send', color: 'text-blue-500', url: `https://t.me/share/url?url=${encodeURIComponent(publicCardUrl)}&text=${encodeURIComponent(`Моя визитка: ${userInfo.name}`)}` },
+    { name: 'WhatsApp', icon: 'MessageCircle', color: 'text-green-500', url: `https://wa.me/?text=${encodeURIComponent(`Моя визитка: ${userInfo.name} ${publicCardUrl}`)}` },
+    { name: 'VK', icon: 'Share2', color: 'text-blue-600', url: `https://vk.com/share.php?url=${encodeURIComponent(publicCardUrl)}&title=${encodeURIComponent(userInfo.name)}` },
+    { name: 'Одноклассники', icon: 'Users', color: 'text-orange-500', url: `https://connect.ok.ru/offer?url=${encodeURIComponent(publicCardUrl)}&title=${encodeURIComponent(userInfo.name)}` },
+    { name: 'VK Мессенджер', icon: 'MessageSquare', color: 'text-blue-500', url: `https://vk.me/share?url=${encodeURIComponent(publicCardUrl)}&title=${encodeURIComponent(`Моя визитка: ${userInfo.name}`)}` },
     { name: 'Скопировать ссылку', icon: 'Link', color: 'text-gray-500', url: '' }
   ];
 
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=BEGIN:VCARD%0AVERSION:3.0%0AFN:${encodeURIComponent(userInfo.name)}%0ATEL:${encodeURIComponent(userInfo.phone)}%0AEMAIL:${encodeURIComponent(userInfo.email)}%0AEND:VCARD`;
+  const handleDownloadQR = () => {
+    if (!qrCodeUrl) return;
+    const a = document.createElement('a');
+    a.href = qrCodeUrl;
+    a.download = `qr-code-${userInfo.name}.png`;
+    a.click();
+  };
 
   const handleDownloadVCard = () => {
     const vcard = `BEGIN:VCARD
@@ -111,7 +151,7 @@ END:VCARD`;
                     title={messenger.name}
                     onClick={() => {
                       if (messenger.name === 'Скопировать ссылку') {
-                        navigator.clipboard.writeText(window.location.origin);
+                        navigator.clipboard.writeText(publicCardUrl);
                         alert('Ссылка скопирована!');
                       } else {
                         window.open(messenger.url, '_blank');
@@ -140,19 +180,41 @@ END:VCARD`;
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="bg-white p-4 rounded-lg">
-              <img
-                src={qrCodeUrl}
-                alt="QR Code"
-                className="w-full h-auto"
-              />
+              {isGeneratingQR ? (
+                <div className="aspect-square flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold"></div>
+                </div>
+              ) : qrCodeUrl ? (
+                <img
+                  src={qrCodeUrl}
+                  alt="QR Code"
+                  className="w-full h-auto"
+                />
+              ) : (
+                <div className="aspect-square flex items-center justify-center text-muted-foreground">
+                  <p>Ошибка загрузки</p>
+                </div>
+              )}
             </div>
-            <Button
-              className="w-full bg-gold text-black hover:bg-gold/90"
-              onClick={handleDownloadVCard}
-            >
-              <Icon name="Download" className="mr-2" size={18} />
-              Скачать vCard
-            </Button>
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={handleDownloadQR}
+                disabled={!qrCodeUrl}
+              >
+                <Icon name="Download" className="mr-2" size={18} />
+                QR-код
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={handleDownloadVCard}
+              >
+                <Icon name="Download" className="mr-2" size={18} />
+                vCard
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
@@ -164,11 +226,22 @@ END:VCARD`;
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="bg-secondary/20 p-3 rounded-lg border border-gold/20">
-              <p className="text-center font-mono text-sm">
-                visitka.site/ivan-petrov
+            <div className="bg-secondary/20 p-3 rounded-lg border border-gold/20 mb-3">
+              <p className="text-center font-mono text-sm break-all">
+                {publicCardUrl}
               </p>
             </div>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                navigator.clipboard.writeText(publicCardUrl);
+                alert('Ссылка скопирована!');
+              }}
+            >
+              <Icon name="Copy" className="mr-2" size={18} />
+              Копировать ссылку
+            </Button>
           </CardContent>
         </Card>
       </div>

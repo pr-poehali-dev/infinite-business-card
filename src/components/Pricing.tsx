@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 
 interface PricingProps {
-  onSelectPlan: () => void;
+  onSelectPlan: (planName: string, price: string) => void;
 }
 
 const Pricing = ({ onSelectPlan }: PricingProps) => {
@@ -134,7 +134,8 @@ const Pricing = ({ onSelectPlan }: PricingProps) => {
                       ? 'bg-gold text-black hover:bg-gold/90' 
                       : 'bg-primary text-primary-foreground'
                   }`}
-                  onClick={onSelectPlan}
+                  onClick={() => onSelectPlan(plan.name, plan.price)}
+                  disabled={plan.name === 'Базовый'}
                 >
                   {plan.cta}
                 </Button>

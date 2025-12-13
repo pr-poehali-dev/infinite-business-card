@@ -1,0 +1,18 @@
+{
+  "tests": [
+    {
+      "name": "Generate QR code for card",
+      "method": "POST",
+      "body": {
+        "card_id": 1,
+        "url": "https://visitka.site/card/1"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "qr_url": "string",
+        "card_id": 1
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

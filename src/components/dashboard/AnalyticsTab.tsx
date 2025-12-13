@@ -1,28 +1,49 @@
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
 import ReputationStats from '../ReputationStats';
 
-const AnalyticsTab = () => {
-  const stats = {
-    totalViews: 127,
-    uniqueVisitors: 89,
-    avgViewTime: '2:34',
-    daysActive: 12
-  };
+interface AnalyticsData {
+  total_views: number;
+  unique_visitors: number;
+  days_active: number;
+  recent_views: Array<{ date: string; device: string; ip: string }>;
+}
 
-  const recentViews = [
-    { date: '12.12.2024 14:30', city: 'Москва', device: 'iPhone 14', duration: '3:45' },
-    { date: '12.12.2024 12:15', city: 'Санкт-Петербург', device: 'Samsung Galaxy', duration: '2:20' },
-    { date: '11.12.2024 18:45', city: 'Казань', device: 'MacBook Pro', duration: '4:12' },
-    { date: '11.12.2024 15:30', city: 'Екатеринбург', device: 'iPad Air', duration: '1:55' },
-    { date: '10.12.2024 20:10', city: 'Новосибирск', device: 'Xiaomi Redmi', duration: '3:20' },
-    { date: '10.12.2024 16:00', city: 'Москва', device: 'iPhone 13', duration: '2:40' },
-    { date: '09.12.2024 11:30', city: 'Краснодар', device: 'Samsung S23', duration: '5:15' },
-    { date: '09.12.2024 09:20', city: 'Самара', device: 'Honor 50', duration: '1:30' },
-    { date: '08.12.2024 17:45', city: 'Нижний Новгород', device: 'iPhone 15', duration: '3:00' },
-    { date: '08.12.2024 14:10', city: 'Челябинск', device: 'Realme GT', duration: '2:10' }
-  ];
+const AnalyticsTab = () => {
+  const [stats, setStats] = useState<AnalyticsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const cardId = 1;
+
+  useEffect(() => {
+    fetchAnalytics();
+     
+  }, []);
+
+  const fetchAnalytics = async () => {
+    try {
+      const userId = localStorage.getItem('user_id');
+      const response = await fetch(
+        `https://functions.poehali.dev/ea725b5f-7761-454d-9939-38a4accb72da?card_id=${cardId}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-Id': userId || ''
+          }
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setStats(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch analytics:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Tabs defaultValue="visits" className="space-y-6">
@@ -38,95 +59,95 @@ const AnalyticsTab = () => {
       </TabsList>
 
       <TabsContent value="visits" className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="border-gold/20">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Icon name="Eye" className="text-gold" size={18} />
-              Всего просмотров
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-gold">{stats.totalViews}</div>
-            <p className="text-xs text-muted-foreground mt-1">за всё время</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-gold/20">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Icon name="Users" className="text-gold" size={18} />
-              Уникальные посетители
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-gold">{stats.uniqueVisitors}</div>
-            <p className="text-xs text-muted-foreground mt-1">уникальных визитов</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-gold/20">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Icon name="Clock" className="text-gold" size={18} />
-              Среднее время
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-gold">{stats.avgViewTime}</div>
-            <p className="text-xs text-muted-foreground mt-1">на визитке</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-gold/20">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Icon name="Calendar" className="text-gold" size={18} />
-              Дней активности
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-gold">{stats.daysActive}</div>
-            <p className="text-xs text-muted-foreground mt-1">дней использования</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card className="border-gold/20">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Icon name="Activity" className="text-gold" size={24} />
-            История просмотров
-          </CardTitle>
-          <CardDescription>
-            Последние 10 просмотров вашей визитки
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {recentViews.map((view, idx) => (
-              <div 
-                key={idx} 
-                className="flex items-center justify-between p-3 rounded-lg bg-secondary/20 border border-gold/10 hover:bg-secondary/30 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gold/10 rounded-lg flex items-center justify-center">
-                    <Icon name="Smartphone" className="text-gold" size={18} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">{view.device}</p>
-                    <p className="text-xs text-muted-foreground">{view.city}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium">{view.duration}</p>
-                  <p className="text-xs text-muted-foreground">{view.date}</p>
-                </div>
-              </div>
-            ))}
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold"></div>
           </div>
-        </CardContent>
-      </Card>
+        ) : stats ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Card className="border-gold/20">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <Icon name="Eye" className="text-gold" size={18} />
+                    Всего просмотров
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-gold">{stats.total_views}</div>
+                  <p className="text-xs text-muted-foreground mt-1">за всё время</p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-gold/20">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <Icon name="Users" className="text-gold" size={18} />
+                    Уникальные посетители
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-gold">{stats.unique_visitors}</div>
+                  <p className="text-xs text-muted-foreground mt-1">уникальных визитов</p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-gold/20">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <Icon name="Calendar" className="text-gold" size={18} />
+                    Дней активности
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-gold">{stats.days_active}</div>
+                  <p className="text-xs text-muted-foreground mt-1">дней использования</p>
+                </CardContent>
+              </Card>
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-12 text-muted-foreground">
+            <p>Не удалось загрузить статистику</p>
+          </div>
+        )}
+
+        {stats && stats.recent_views.length > 0 && (
+          <Card className="border-gold/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Icon name="Activity" className="text-gold" size={24} />
+                История просмотров
+              </CardTitle>
+              <CardDescription>
+                Последние {stats.recent_views.length} просмотров вашей визитки
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {stats.recent_views.map((view, idx) => (
+                  <div 
+                    key={idx} 
+                    className="flex items-center justify-between p-3 rounded-lg bg-secondary/20 border border-gold/10 hover:bg-secondary/30 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gold/10 rounded-lg flex items-center justify-center">
+                        <Icon name="Smartphone" className="text-gold" size={18} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{view.device}</p>
+                        <p className="text-xs text-muted-foreground">{view.ip}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-muted-foreground">{view.date}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </TabsContent>
 
       <TabsContent value="reputation" className="space-y-6">
