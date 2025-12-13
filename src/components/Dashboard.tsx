@@ -22,6 +22,7 @@ import VideoDemo from './VideoDemo';
 import WelcomeNotification from './WelcomeNotification';
 import HelpButton from './HelpButton';
 import ProgressTracker from './ProgressTracker';
+import SettingsTab from './dashboard/SettingsTab';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -92,7 +93,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         <ProgressTracker userInfo={userInfo} />
 
         <Tabs defaultValue="card" className="space-y-6">
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-11 w-full">
+          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-12 w-full">
             <TabsTrigger value="card">
               <Icon name="CreditCard" className="mr-2" size={18} />
               <span className="hidden sm:inline">Визитка</span>
@@ -136,6 +137,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
             <TabsTrigger value="referral">
               <Icon name="Gift" className="mr-2" size={18} />
               <span className="hidden sm:inline">Реферал</span>
+            </TabsTrigger>
+            <TabsTrigger value="settings">
+              <Icon name="Settings" className="mr-2" size={18} />
+              <span className="hidden sm:inline">Настройки</span>
             </TabsTrigger>
           </TabsList>
 
@@ -181,6 +186,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
           <TabsContent value="referral" className="space-y-6">
             <ReferralTab />
+          </TabsContent>
+
+          <TabsContent value="settings" className="space-y-6">
+            <SettingsTab />
           </TabsContent>
         </Tabs>
       </main>

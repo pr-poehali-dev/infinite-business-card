@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
+import ExportMenu from '../ExportMenu';
 
 interface UserInfo {
   name: string;
@@ -196,24 +197,39 @@ END:VCARD`;
                 </div>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={handleDownloadQR}
-                disabled={!qrCodeUrl}
-              >
-                <Icon name="Download" className="mr-2" size={18} />
-                QR-код
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={handleDownloadVCard}
-              >
-                <Icon name="Download" className="mr-2" size={18} />
-                vCard
-              </Button>
+            <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleDownloadQR}
+                  disabled={!qrCodeUrl}
+                >
+                  <Icon name="Download" className="mr-2" size={18} />
+                  QR-код
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleDownloadVCard}
+                >
+                  <Icon name="Download" className="mr-2" size={18} />
+                  vCard
+                </Button>
+              </div>
+              <ExportMenu 
+                type="card"
+                cardData={{
+                  name: userInfo.name,
+                  position: userInfo.position,
+                  company: userInfo.company,
+                  phone: userInfo.phone,
+                  email: userInfo.email,
+                  website: userInfo.website,
+                  description: userInfo.description,
+                  qr_code_url: qrCodeUrl || undefined
+                }}
+              />
             </div>
           </CardContent>
         </Card>

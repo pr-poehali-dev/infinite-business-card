@@ -3,8 +3,14 @@ import { createRoot } from 'react-dom/client'
 import App from './App'
 import './index.css'
 import { initMetrika } from './lib/metrika'
+import { notificationService } from './lib/notifications'
 
 initMetrika();
+
+// Инициализация уведомлений
+notificationService.init().catch(err => {
+  console.warn('Notifications init failed:', err);
+});
 
 // Регистрация Service Worker для PWA
 if ('serviceWorker' in navigator) {
