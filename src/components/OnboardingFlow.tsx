@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import Icon from '@/components/ui/icon';
@@ -233,6 +234,10 @@ const OnboardingFlow = ({ open, onComplete, userName = 'друг' }: OnboardingF
   return (
     <Dialog open={isVisible} onOpenChange={() => {}}>
       <DialogContent className="max-w-2xl" hideClose>
+        <VisuallyHidden>
+          <DialogTitle>{currentStepData.title}</DialogTitle>
+          <DialogDescription>{currentStepData.description}</DialogDescription>
+        </VisuallyHidden>
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}

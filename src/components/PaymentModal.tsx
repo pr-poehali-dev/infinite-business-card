@@ -152,31 +152,29 @@ const PaymentModal = ({
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-6">
-              {showSetupAlert && (
-                <Alert className="border-yellow/20 bg-yellow/10">
-                  <Icon name="AlertCircle" size={18} className="text-yellow" />
-                  <AlertTitle className="text-yellow">Требуется настройка</AlertTitle>
-                  <AlertDescription className="space-y-3">
-                    <p className="text-sm text-muted-foreground">
-                      Для приёма платежей необходимо настроить интеграцию с ЮKassa
-                    </p>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full"
-                      onClick={() => {
-                        onOpenChange(false);
-                        navigate('/yookassa-setup');
-                      }}
-                    >
-                      <Icon name="Settings" size={14} className="mr-2" />
-                      Перейти к настройке
-                    </Button>
-                  </AlertDescription>
-                </Alert>
-              )}
-            </div>
+            {showSetupAlert && (
+              <Alert className="border-yellow/20 bg-yellow/10">
+                <Icon name="AlertCircle" size={18} className="text-yellow" />
+                <AlertTitle className="text-yellow">Требуется настройка</AlertTitle>
+                <AlertDescription className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    Для приёма платежей необходимо настроить интеграцию с ЮKassa
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                    onClick={() => {
+                      onOpenChange(false);
+                      navigate('/yookassa-setup');
+                    }}
+                  >
+                    <Icon name="Settings" size={14} className="mr-2" />
+                    Перейти к настройке
+                  </Button>
+                </AlertDescription>
+              </Alert>
+            )}
 
             <div className="space-y-6">
               <div className="bg-gradient-to-br from-blue/10 to-green/10 rounded-lg p-4 border border-blue/20">
