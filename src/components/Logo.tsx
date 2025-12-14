@@ -36,12 +36,14 @@ const Logo = ({ variant = 'default', size = 'md', animated = true, className = '
 
   const getImgSrc = () => {
     if (variant === 'light') {
-      return 'https://cdn.poehali.dev/files/61582.jpg';
+      return 'https://cdn.poehali.dev/files/61581.jpg';
     }
     if (variant === 'dark') {
       return 'https://cdn.poehali.dev/files/61582.jpg';
     }
-    return 'https://cdn.poehali.dev/files/61582.jpg';
+    return isDark
+      ? 'https://cdn.poehali.dev/files/61582.jpg'
+      : 'https://cdn.poehali.dev/files/61581.jpg';
   };
 
   return (
