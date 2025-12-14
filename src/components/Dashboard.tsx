@@ -109,57 +109,57 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
         <Tabs defaultValue="card" className="space-y-6">
           <TabsList className="flex flex-wrap justify-start gap-2 h-auto w-full bg-muted/50 p-2">
-            <TabsTrigger value="card">
-              <Icon name="CreditCard" className="mr-2" size={18} />
-              <span className="hidden sm:inline">Визитка</span>
+            <TabsTrigger value="card" className="flex-shrink-0">
+              <Icon name="CreditCard" size={18} />
+              <span className="ml-2">Визитка</span>
             </TabsTrigger>
-            <TabsTrigger value="edit">
-              <Icon name="Edit" className="mr-2" size={18} />
-              <span className="hidden sm:inline">Редактировать</span>
+            <TabsTrigger value="edit" className="flex-shrink-0">
+              <Icon name="Edit" size={18} />
+              <span className="ml-2">Редактировать</span>
             </TabsTrigger>
-            <TabsTrigger value="templates">
-              <Icon name="LayoutTemplate" className="mr-2" size={18} />
-              <span className="hidden sm:inline">Шаблоны</span>
+            <TabsTrigger value="templates" className="flex-shrink-0">
+              <Icon name="LayoutTemplate" size={18} />
+              <span className="ml-2">Шаблоны</span>
             </TabsTrigger>
-            <TabsTrigger value="design">
-              <Icon name="Palette" className="mr-2" size={18} />
-              <span className="hidden sm:inline">Дизайн</span>
+            <TabsTrigger value="design" className="flex-shrink-0">
+              <Icon name="Palette" size={18} />
+              <span className="ml-2">Дизайн</span>
             </TabsTrigger>
-            <TabsTrigger value="analytics">
-              <Icon name="BarChart" className="mr-2" size={18} />
-              <span className="hidden sm:inline">Аналитика</span>
+            <TabsTrigger value="analytics" className="flex-shrink-0">
+              <Icon name="BarChart" size={18} />
+              <span className="ml-2">Аналитика</span>
             </TabsTrigger>
-            <TabsTrigger value="integrations">
-              <Icon name="Plug" className="mr-2" size={18} />
-              <span className="hidden sm:inline">Интеграции</span>
+            <TabsTrigger value="integrations" className="flex-shrink-0">
+              <Icon name="Plug" size={18} />
+              <span className="ml-2">Интеграции</span>
             </TabsTrigger>
-            <TabsTrigger value="team">
-              <Icon name="Users" className="mr-2" size={18} />
-              <span className="hidden sm:inline">Команда</span>
+            <TabsTrigger value="team" className="flex-shrink-0">
+              <Icon name="Users" size={18} />
+              <span className="ml-2">Команда</span>
             </TabsTrigger>
-            <TabsTrigger value="leads">
-              <Icon name="Inbox" className="mr-2" size={18} />
-              <span className="hidden sm:inline">Лиды</span>
+            <TabsTrigger value="leads" className="flex-shrink-0">
+              <Icon name="Inbox" size={18} />
+              <span className="ml-2">Лиды</span>
             </TabsTrigger>
-            <TabsTrigger value="portfolio">
-              <Icon name="Briefcase" className="mr-2" size={18} />
-              <span className="hidden sm:inline">Портфолио</span>
+            <TabsTrigger value="portfolio" className="flex-shrink-0">
+              <Icon name="Briefcase" size={18} />
+              <span className="ml-2">Портфолио</span>
             </TabsTrigger>
-            <TabsTrigger value="reviews">
-              <Icon name="Star" className="mr-2" size={18} />
-              <span className="hidden sm:inline">Отзывы</span>
+            <TabsTrigger value="reviews" className="flex-shrink-0">
+              <Icon name="Star" size={18} />
+              <span className="ml-2">Отзывы</span>
             </TabsTrigger>
-            <TabsTrigger value="subscription">
-              <Icon name="Sparkles" className="mr-2" size={18} />
-              <span className="hidden sm:inline">Подписка</span>
+            <TabsTrigger value="subscription" className="flex-shrink-0">
+              <Icon name="Sparkles" size={18} />
+              <span className="ml-2">Подписка</span>
             </TabsTrigger>
-            <TabsTrigger value="referral">
-              <Icon name="Gift" className="mr-2" size={18} />
-              <span className="hidden sm:inline">Реферал</span>
+            <TabsTrigger value="referral" className="flex-shrink-0">
+              <Icon name="Gift" size={18} />
+              <span className="ml-2">Реферал</span>
             </TabsTrigger>
-            <TabsTrigger value="settings">
-              <Icon name="Settings" className="mr-2" size={18} />
-              <span className="hidden sm:inline">Настройки</span>
+            <TabsTrigger value="settings" className="flex-shrink-0">
+              <Icon name="Settings" size={18} />
+              <span className="ml-2">Настройки</span>
             </TabsTrigger>
           </TabsList>
 
