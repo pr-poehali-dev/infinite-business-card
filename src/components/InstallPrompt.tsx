@@ -59,7 +59,7 @@ const InstallPrompt = () => {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-50 animate-fade-in">
+    <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-[60] animate-fade-in">
       <div className="bg-card border border-gold/30 rounded-lg shadow-2xl p-4 glass-effect">
         <div className="flex items-start gap-3">
           <div className="w-12 h-12 bg-gold rounded-lg flex items-center justify-center flex-shrink-0">
