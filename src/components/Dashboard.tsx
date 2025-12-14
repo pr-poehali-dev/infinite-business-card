@@ -30,14 +30,24 @@ interface DashboardProps {
 }
 
 const Dashboard = ({ onLogout }: DashboardProps) => {
-  const [userInfo, setUserInfo] = useState({
-    name: 'Иван Петров',
-    position: 'Генеральный директор',
-    company: 'ООО "Инновационные решения"',
-    phone: '+7 (999) 123-45-67',
-    email: 'ivan@company.ru',
-    website: 'company.ru',
-    description: 'Предлагаем комплексные решения в области IT-консалтинга и автоматизации бизнес-процессов'
+  const [userInfo, setUserInfo] = useState(() => {
+    const saved = localStorage.getItem('userInfo');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        // Если не удалось распарсить, используем дефолтные значения
+      }
+    }
+    return {
+      name: 'Иван Петров',
+      position: 'Генеральный директор',
+      company: 'ООО "Инновационные решения"',
+      phone: '+7 (999) 123-45-67',
+      email: 'ivan@company.ru',
+      website: 'company.ru',
+      description: 'Предлагаем комплексные решения в области IT-консалтинга и автоматизации бизнес-процессов'
+    };
   });
 
   const [analyticsOpen, setAnalyticsOpen] = useState(false);
@@ -51,6 +61,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
       setShowOnboarding(true);
     }
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('userInfo', JSON.stringify(userInfo));
+  }, [userInfo]);
 
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
@@ -94,7 +108,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         <ProgressTracker userInfo={userInfo} />
 
         <Tabs defaultValue="card" className="space-y-6">
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-13 w-full">
+          <TabsList className="flex flex-wrap justify-start gap-2 h-auto w-full bg-muted/50 p-2">
             <TabsTrigger value="card">
               <Icon name="CreditCard" className="mr-2" size={18} />
               <span className="hidden sm:inline">Визитка</span>

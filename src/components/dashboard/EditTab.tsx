@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
+import { toast } from 'sonner';
 
 interface UserInfo {
   name: string;
@@ -22,7 +23,13 @@ interface EditTabProps {
 
 const EditTab = ({ userInfo, setUserInfo }: EditTabProps) => {
   const handleSave = () => {
-    alert('Изменения сохранены!');
+    try {
+      localStorage.setItem('userInfo', JSON.stringify(userInfo));
+      toast.success('Изменения успешно сохранены!');
+    } catch (error) {
+      toast.error('Ошибка при сохранении данных');
+      console.error('Save error:', error);
+    }
   };
 
   return (
