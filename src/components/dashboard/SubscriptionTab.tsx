@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +8,8 @@ import Icon from '@/components/ui/icon';
 import PricingPlans from '../PricingPlans';
 import PricingComparison from '../PricingComparison';
 import PaymentModal from '../PaymentModal';
+import SubscriptionNotifications from './SubscriptionNotifications';
+import { subscriptionMonitor } from '@/lib/subscriptionMonitor';
 
 const SubscriptionTab = () => {
   const [showPayment, setShowPayment] = useState(false);
@@ -25,6 +27,19 @@ const SubscriptionTab = () => {
       storage: { used: 2.3, limit: 100 }
     }
   };
+
+  useEffect(() => {
+    subscriptionMonitor.start({
+      plan: subscription.plan,
+      status: subscription.status as 'active' | 'expiring' | 'expired',
+      endDate: subscription.endDate,
+      features: subscription.features
+    });
+
+    return () => {
+      subscriptionMonitor.stop();
+    };
+  }, []);
 
   const handleSelectPlan = (planId: string) => {
     const plans: Record<string, { name: string; price: number }> = {
@@ -147,6 +162,8 @@ const SubscriptionTab = () => {
           </CardContent>
         </Card>
       </div>
+
+      <SubscriptionNotifications />
 
       <Tabs defaultValue="plans" className="w-full">
         <TabsList className="grid w-full grid-cols-3">

@@ -147,6 +147,26 @@ class NotificationService {
       data: { type: 'report', stats }
     });
   }
+
+  async showLimitWarning(resource: string, percentage: number) {
+    await this.show({
+      title: '⚠️ Приближается лимит',
+      body: `Использовано ${percentage}% лимита ${resource}`,
+      tag: `limit-warning-${resource}`,
+      requireInteraction: true,
+      data: { type: 'limit-warning', resource }
+    });
+  }
+
+  async showLimitReached(resource: string) {
+    await this.show({
+      title: '🚫 Лимит исчерпан',
+      body: `Достигнут лимит ${resource}. Улучшите тариф.`,
+      tag: `limit-reached-${resource}`,
+      requireInteraction: true,
+      data: { type: 'limit-reached', resource }
+    });
+  }
 }
 
 export const notificationService = new NotificationService();
