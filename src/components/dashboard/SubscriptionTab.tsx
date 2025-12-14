@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
 import Icon from '@/components/ui/icon';
 import PricingPlans from '../PricingPlans';
 import PricingComparison from '../PricingComparison';
@@ -12,6 +14,7 @@ import SubscriptionNotifications from './SubscriptionNotifications';
 import { subscriptionMonitor } from '@/lib/subscriptionMonitor';
 
 const SubscriptionTab = () => {
+  const navigate = useNavigate();
   const [showPayment, setShowPayment] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState({ name: '', price: 0, period: 'monthly' as 'monthly' | 'yearly' });
   const [currentPlan] = useState('free');
@@ -341,10 +344,31 @@ const SubscriptionTab = () => {
               </p>
             </details>
 
-            <Button variant="outline" className="w-full">
-              <Icon name="MessageCircle" className="mr-2" size={16} />
-              Задать вопрос в поддержку
-            </Button>
+            <details className="group">
+              <summary className="flex items-center justify-between cursor-pointer p-3 hover:bg-muted/30 rounded-lg">
+                <span className="text-sm font-medium">Как настроить платежную систему?</span>
+                <Icon name="ChevronDown" size={16} className="group-open:rotate-180 transition-transform" />
+              </summary>
+              <p className="text-sm text-muted-foreground p-3">
+                Для приёма оплаты нужно подключить ЮKassa. Следуйте инструкции по настройке.
+              </p>
+            </details>
+
+            <div className="space-y-2">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => navigate('/yookassa-setup')}
+              >
+                <Icon name="Settings" className="mr-2" size={16} />
+                Настроить ЮKassa
+              </Button>
+              
+              <Button variant="outline" className="w-full">
+                <Icon name="MessageCircle" className="mr-2" size={16} />
+                Задать вопрос в поддержку
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

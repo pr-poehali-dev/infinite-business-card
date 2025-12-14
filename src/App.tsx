@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import PublicCard from "./pages/PublicCard";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentError from "./pages/PaymentError";
+import YooKassaSetup from "./pages/YooKassaSetup";
 import NotFound from "./pages/NotFound";
 import InstallPrompt from "./components/InstallPrompt";
 
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/card/:id" element={<PublicCard />} />
             <Route path="/payment/success" element={<PaymentSuccess />} />
             <Route path="/payment/error" element={<PaymentError />} />
+            <Route path="/yookassa-setup" element={<YooKassaSetup />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
