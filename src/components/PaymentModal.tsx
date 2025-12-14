@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +9,11 @@ import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
 import { paymentService } from '@/lib/payment';
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from '@/components/ui/alert';
 
 interface PaymentModalProps {
   open: boolean;
@@ -24,9 +30,11 @@ const PaymentModal = ({
   planPrice,
   billingPeriod 
 }: PaymentModalProps) => {
+  const navigate = useNavigate();
   const [step, setStep] = useState<'details' | 'payment' | 'success'>('details');
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'sbp'>('card');
+  const [showSetupAlert, setShowSetupAlert] = useState(false);
   
   const [cardData, setCardData] = useState({
     number: '',
@@ -102,7 +110,15 @@ const PaymentModal = ({
       });
 
     } catch (error: any) {
-      toast.error(error.message || 'Ошибка при создании платежа');
+      const errorMessage = error.message || 'Ошибка при создании платежа';
+      
+      if (errorMessage.includes('не настроена') || errorMessage.includes('not configured')) {
+        setShowSetupAlert(true);
+        toast.error('Платёжная система не настроена');
+      } else {
+        toast.error(errorMessage);
+      }
+      
       setLoading(false);
     }
   };
@@ -135,6 +151,32 @@ const PaymentModal = ({
                 Выбран тариф: <strong>{planName}</strong>
               </DialogDescription>
             </DialogHeader>
+
+            <div className="space-y-6">
+              {showSetupAlert && (
+                <Alert className="border-yellow/20 bg-yellow/10">
+                  <Icon name="AlertCircle" size={18} className="text-yellow" />
+                  <AlertTitle className="text-yellow">Требуется настройка</AlertTitle>
+                  <AlertDescription className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Для приёма платежей необходимо настроить интеграцию с ЮKassa
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full"
+                      onClick={() => {
+                        onOpenChange(false);
+                        navigate('/yookassa-setup');
+                      }}
+                    >
+                      <Icon name="Settings" size={14} className="mr-2" />
+                      Перейти к настройке
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              )}
+            </div>
 
             <div className="space-y-6">
               <div className="bg-gradient-to-br from-blue/10 to-green/10 rounded-lg p-4 border border-blue/20">
