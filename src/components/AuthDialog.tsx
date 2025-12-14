@@ -9,6 +9,7 @@ import { api } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import Icon from '@/components/ui/icon';
 import PrivacyPolicy from './PrivacyPolicy';
+import DemoAccountsDialog from './DemoAccountsDialog';
 
 interface AuthDialogProps {
   open: boolean;
@@ -21,9 +22,33 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
   const { toast } = useToast();
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [agreedToPolicy, setAgreedToPolicy] = useState(false);
+  const [demoAccountsOpen, setDemoAccountsOpen] = useState(false);
   
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [registerData, setRegisterData] = useState({ email: '', password: '', name: '' });
+
+  const handleDemoAccountSelect = async (account: any) => {
+    setLoginData({ email: account.email, password: account.password });
+    setIsLoading(true);
+
+    try {
+      await api.login(account.email, account.password);
+      toast({
+        title: 'Вход выполнен',
+        description: `Добро пожаловать, ${account.name}!`,
+      });
+      onSuccess();
+      onOpenChange(false);
+    } catch (error: any) {
+      toast({
+        title: 'Ошибка входа',
+        description: 'Не удалось войти в демо-аккаунт',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,6 +179,27 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
                   'Войти'
                 )}
               </Button>
+
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    или
+                  </span>
+                </div>
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => setDemoAccountsOpen(true)}
+              >
+                <Icon name="Users" className="mr-2" size={18} />
+                Войти как тестовый пользователь
+              </Button>
             </form>
           </TabsContent>
 
@@ -260,6 +306,11 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
       </DialogContent>
       
       <PrivacyPolicy open={privacyOpen} onOpenChange={setPrivacyOpen} />
+      <DemoAccountsDialog 
+        open={demoAccountsOpen}
+        onOpenChange={setDemoAccountsOpen}
+        onAccountSelect={handleDemoAccountSelect}
+      />
     </Dialog>
   );
 };
