@@ -1,0 +1,28 @@
+{
+  "tests": [
+    {
+      "name": "Check rate limiter allows first request",
+      "method": "POST",
+      "body": {
+        "identifier": "user123",
+        "max_requests": 5,
+        "window_seconds": 60
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "allowed": true
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Check rate limiter blocks after limit",
+      "method": "POST",
+      "body": {
+        "identifier": "user456",
+        "max_requests": 1,
+        "window_seconds": 60
+      },
+      "expectedStatus": 200
+    }
+  ]
+}
