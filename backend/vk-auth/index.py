@@ -4,7 +4,7 @@ import urllib.request
 import urllib.parse
 import psycopg2
 from datetime import datetime, timedelta
-import secrets
+import jwt
 
 def handler(event, context):
     '''
@@ -100,7 +100,7 @@ def handler(event, context):
         cur = conn.cursor()
         
         cur.execute(
-            "SELECT id, email FROM users WHERE vk_id = %s",
+            "SELECT id, email FROM t_p18253922_infinite_business_ca.users WHERE vk_id = %s",
             (str(vk_user_id),)
         )
         existing_user = cur.fetchone()
@@ -112,7 +112,7 @@ def handler(event, context):
                 vk_email = f"vk{vk_user_id}@visitka.site"
             
             cur.execute(
-                "INSERT INTO users (email, full_name, vk_id, created_at) VALUES (%s, %s, %s, %s) RETURNING id",
+                "INSERT INTO t_p18253922_infinite_business_ca.users (email, name, vk_id, created_at) VALUES (%s, %s, %s, %s) RETURNING id",
                 (vk_email, full_name, str(vk_user_id), datetime.now())
             )
             user_id = cur.fetchone()[0]
@@ -120,9 +120,13 @@ def handler(event, context):
         token = secrets.token_urlsafe(32)
         expires_at = datetime.now() + timedelta(days=30)
         
-        cur.execute(
-            "UPDATE users SET auth_token = %s, token_expires_at = %s WHERE id = %s",
-            (token, expires_at, user_id)
+        # VK auth doesn't need token update, using JWT instead
+        import jwt
+        
+        token = jwt.encode(
+            {'user_id': user_id, 'email': vk_email, 'exp': expires_at},
+            'secret_key_change_in_production',
+            algorithm='HS256'
         )
         
         conn.commit()
@@ -137,7 +141,7 @@ def handler(event, context):
                 'user': {
                     'id': user_id,
                     'email': vk_email,
-                    'full_name': full_name
+                    'name': full_name
                 }
             }),
             'isBase64Encoded': False
