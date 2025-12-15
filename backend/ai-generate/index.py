@@ -2,11 +2,13 @@ import json
 import os
 import base64
 import boto3
-from openai import OpenAI
+import requests
+import uuid
+import time
 
 def handler(event, context):
     '''
-    AI-генерация изображений через DALL-E 3
+    AI-генерация изображений через GigaChat (Kandinsky от Сбера)
     POST / - генерация изображения по текстовому описанию
     Требуется Premium подписка
     '''
@@ -56,26 +58,65 @@ def handler(event, context):
                 'isBase64Encoded': False
             }
         
-        client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+        # Получаем access token GigaChat
+        gigachat_api_key = os.environ.get('GIGACHAT_API_KEY')
         
-        response = client.images.generate(
-            model="dall-e-3",
-            prompt=f"Professional business logo or image: {prompt}. Modern, clean, high quality.",
-            size="1024x1024",
-            quality="standard",
-            n=1
+        auth_response = requests.post(
+            'https://ngw.devices.sberbank.ru:9443/api/v2/oauth',
+            headers={
+                'Authorization': f'Basic {gigachat_api_key}',
+                'RqUID': str(uuid.uuid4()),
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            data={'scope': 'GIGACHAT_API_PERS'},
+            verify=False
         )
         
-        image_url = response.data[0].url
+        access_token = auth_response.json()['access_token']
+        
+        # Генерируем изображение через GigaChat
+        enhanced_prompt = f"Профессиональный бизнес логотип: {prompt}. Современный, чистый дизайн, высокое качество."
+        
+        generation_response = requests.post(
+            'https://gigachat.devices.sberbank.ru/api/v1/chat/completions',
+            headers={
+                'Authorization': f'Bearer {access_token}',
+                'Content-Type': 'application/json'
+            },
+            json={
+                'model': 'GigaChat',
+                'messages': [
+                    {
+                        'role': 'user',
+                        'content': enhanced_prompt
+                    }
+                ],
+                'function_call': 'text2image'
+            },
+            verify=False
+        )
+        
+        result = generation_response.json()
+        
+        # Извлекаем base64 изображение из ответа
+        image_base64 = None
+        if 'choices' in result and len(result['choices']) > 0:
+            content = result['choices'][0]['message']['content']
+            # GigaChat возвращает изображение в формате <img src="data:image/png;base64,..." />
+            if 'base64,' in content:
+                image_base64 = content.split('base64,')[1].split('"')[0]
+        
+        if not image_base64:
+            raise Exception('Failed to generate image')
+        
+        # Декодируем и загружаем в S3
+        img_data = base64.b64decode(image_base64)
         
         s3 = boto3.client('s3',
             endpoint_url='https://bucket.poehali.dev',
             aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
             aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY']
         )
-        
-        import urllib.request
-        img_data = urllib.request.urlopen(image_url).read()
         
         file_key = f'ai-generated/{user_id}/{context.request_id}.png'
         
