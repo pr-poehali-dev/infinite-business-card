@@ -2,6 +2,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
+import FadeIn from '@/components/animations/FadeIn';
+import ScaleIn from '@/components/animations/ScaleIn';
+import AnimatedCard from '@/components/ui/animated-card';
 
 interface PricingProps {
   onSelectPlan: (planName: string, price: string) => void;
@@ -77,19 +80,26 @@ const Pricing = ({ onSelectPlan }: PricingProps) => {
   return (
     <section id="pricing" className="py-24 bg-muted/30">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16 animate-fade-in">
-          <Badge className="mb-4 bg-green/10 text-green border-green/20 font-semibold">Тарифы</Badge>
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 gradient-text">
-            Выберите свой план
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            От бесплатного старта до корпоративного решения
-          </p>
+        <div className="text-center mb-16">
+          <FadeIn>
+            <Badge className="mb-4 bg-green/10 text-green border-green/20 font-semibold">Тарифы</Badge>
+          </FadeIn>
+          <FadeIn delay={0.1}>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 gradient-text">
+              Выберите свой план
+            </h2>
+          </FadeIn>
+          <FadeIn delay={0.2}>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              От бесплатного старта до корпоративного решения
+            </p>
+          </FadeIn>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {plans.map((plan, index) => (
-            <Card 
+            <ScaleIn key={index} delay={index * 0.1}>
+              <Card 
               key={index}
               className={`relative overflow-hidden transition-all duration-300 hover:scale-105 ${
                 plan.popular 
@@ -142,6 +152,7 @@ const Pricing = ({ onSelectPlan }: PricingProps) => {
                 </Button>
               </CardFooter>
             </Card>
+            </ScaleIn>
           ))}
         </div>
 

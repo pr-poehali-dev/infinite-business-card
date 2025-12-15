@@ -9,12 +9,12 @@ from psycopg2.extras import RealDictCursor
 def handler(event, context):
     '''
     Обработка платежей через ЮKassa
-    POST /create - создание платежа
-    POST /callback - webhook от ЮKassa
-    GET /status - проверка статуса платежа
+    POST - создание платежа
+    GET - проверка статуса платежа по payment_id
     '''
     method = event.get('httpMethod', 'GET')
-    path = event.get('path', '/')
+    params = event.get('queryStringParameters') or {}
+    action = params.get('action', 'create')
     
     if method == 'OPTIONS':
         return {
@@ -33,7 +33,7 @@ def handler(event, context):
         conn = psycopg2.connect(os.environ['DATABASE_URL'])
         cur = conn.cursor(cursor_factory=RealDictCursor)
         
-        if method == 'POST' and 'create' in path:
+        if method == 'POST':
             headers = event.get('headers', {})
             user_id = headers.get('X-User-Id') or headers.get('x-user-id')
             
@@ -127,26 +127,7 @@ def handler(event, context):
                 'isBase64Encoded': False
             }
         
-        elif method == 'POST' and 'callback' in path:
-            body = json.loads(event.get('body', '{}'))
-            payment_id = body.get('object', {}).get('id')
-            status = body.get('object', {}).get('status')
-            
-            if payment_id:
-                cur.execute(
-                    "UPDATE payments SET status = %s, updated_at = CURRENT_TIMESTAMP WHERE provider_payment_id = %s",
-                    (status, payment_id)
-                )
-                conn.commit()
-            
-            return {
-                'statusCode': 200,
-                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                'body': json.dumps({'success': True}),
-                'isBase64Encoded': False
-            }
-        
-        elif method == 'GET' and 'status' in path:
+        elif method == 'GET':
             params = event.get('queryStringParameters', {})
             payment_id = params.get('payment_id')
             

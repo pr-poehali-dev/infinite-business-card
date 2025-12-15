@@ -1,10 +1,18 @@
 {
   "tests": [
     {
-      "name": "Health check",
+      "name": "Check OPTIONS for CORS",
       "method": "OPTIONS",
-      "path": "/",
       "expectedStatus": 200
+    },
+    {
+      "name": "Check payment creation requires auth",
+      "method": "POST",
+      "body": {
+        "amount": 790,
+        "payment_type": "subscription"
+      },
+      "expectedStatus": 401
     }
   ]
 }
