@@ -29,9 +29,12 @@ def handler(event, context):
             'isBase64Encoded': False
         }
     
+    conn = None
+    cur = None
+    
     try:
         conn = psycopg2.connect(os.environ['DATABASE_URL'])
-        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur = conn.cursor()
         
         if method == 'POST':
             headers = event.get('headers', {})
@@ -59,8 +62,8 @@ def handler(event, context):
             
             idempotence_key = str(uuid.uuid4())
             
-            shop_id = os.environ.get('YUKASSA_SHOP_ID')
-            secret_key = os.environ.get('YUKASSA_SECRET_KEY')
+            shop_id = os.environ.get('YOOKASSA_SHOP_ID')
+            secret_key = os.environ.get('YOOKASSA_SECRET_KEY')
             
             auth_string = f"{shop_id}:{secret_key}"
             auth_bytes = base64.b64encode(auth_string.encode()).decode()
@@ -97,24 +100,24 @@ def handler(event, context):
             
             yukassa_data = yukassa_response.json()
             
-            cur.execute(
-                """
+            escaped_metadata = json.dumps(yukassa_data).replace("'", "''")
+            cur.execute(f"""
                 INSERT INTO t_p18253922_infinite_business_ca.payments 
                 (user_id, amount, payment_type, payment_provider, provider_payment_id, status, metadata)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-                RETURNING *
-                """,
-                (
-                    user_id,
-                    amount,
-                    payment_type,
-                    'yukassa',
-                    yukassa_data.get('id'),
-                    yukassa_data.get('status'),
-                    json.dumps(yukassa_data)
-                )
-            )
-            payment = dict(cur.fetchone())
+                VALUES ({user_id}, {amount}, '{payment_type}', 'yukassa', '{yukassa_data.get('id')}', '{yukassa_data.get('status')}', '{escaped_metadata}')
+                RETURNING id, user_id, amount, payment_type, payment_provider, provider_payment_id, status, created_at
+            """)
+            result = cur.fetchone()
+            payment = {
+                'id': result[0],
+                'user_id': result[1],
+                'amount': result[2],
+                'payment_type': result[3],
+                'payment_provider': result[4],
+                'provider_payment_id': result[5],
+                'status': result[6],
+                'created_at': str(result[7])
+            }
             conn.commit()
             
             return {
@@ -139,13 +142,10 @@ def handler(event, context):
                     'isBase64Encoded': False
                 }
             
-            cur.execute(
-                "SELECT * FROM t_p18253922_infinite_business_ca.payments WHERE id = %s",
-                (payment_id,)
-            )
-            payment = cur.fetchone()
+            cur.execute(f"SELECT id, user_id, amount, payment_type, status, created_at FROM t_p18253922_infinite_business_ca.payments WHERE id = {payment_id}")
+            result = cur.fetchone()
             
-            if not payment:
+            if not result:
                 return {
                     'statusCode': 404,
                     'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
@@ -153,10 +153,19 @@ def handler(event, context):
                     'isBase64Encoded': False
                 }
             
+            payment = {
+                'id': result[0],
+                'user_id': result[1],
+                'amount': result[2],
+                'payment_type': result[3],
+                'status': result[4],
+                'created_at': str(result[5])
+            }
+            
             return {
                 'statusCode': 200,
                 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                'body': json.dumps({'payment': dict(payment)}, default=str),
+                'body': json.dumps({'payment': payment}),
                 'isBase64Encoded': False
             }
         
@@ -169,6 +178,8 @@ def handler(event, context):
             }
     
     except Exception as e:
+        if conn:
+            conn.rollback()
         return {
             'statusCode': 500,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
@@ -177,7 +188,7 @@ def handler(event, context):
         }
     
     finally:
-        if 'cur' in locals():
+        if cur:
             cur.close()
-        if 'conn' in locals():
+        if conn:
             conn.close()
