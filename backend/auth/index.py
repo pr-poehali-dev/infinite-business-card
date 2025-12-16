@@ -4,7 +4,6 @@ import hashlib
 import jwt
 from datetime import datetime, timedelta
 import psycopg2
-from psycopg2.extras import RealDictCursor
 
 def handler(event, context):
     '''
@@ -35,17 +34,20 @@ def handler(event, context):
             'isBase64Encoded': False
         }
     
+    conn = None
+    cur = None
+    
     try:
         body = json.loads(event.get('body', '{}'))
         action = body.get('action')
         
         conn = psycopg2.connect(os.environ['DATABASE_URL'])
-        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur = conn.cursor()
         
         if action == 'register':
-            email = body.get('email')
-            password = body.get('password')
-            name = body.get('name')
+            email = body.get('email', '').replace("'", "''")
+            password = body.get('password', '')
+            name = body.get('name', '').replace("'", "''")
             
             if not email or not password or not name:
                 return {
@@ -57,16 +59,11 @@ def handler(event, context):
             
             password_hash = hashlib.sha256(password.encode()).hexdigest()
             
-            cur.execute(
-                "INSERT INTO t_p18253922_infinite_business_ca.users (email, password_hash, name) VALUES (%s, %s, %s) RETURNING id, email, name",
-                (email, password_hash, name)
-            )
-            user = dict(cur.fetchone())
+            cur.execute(f"INSERT INTO t_p18253922_infinite_business_ca.users (email, password_hash, name) VALUES ('{email}', '{password_hash}', '{name}') RETURNING id, email, name")
+            result = cur.fetchone()
+            user = {'id': result[0], 'email': result[1], 'name': result[2]}
             
-            cur.execute(
-                "INSERT INTO t_p18253922_infinite_business_ca.user_subscriptions (user_id, plan_id, status) VALUES (%s, 1, %s)",
-                (user['id'], 'active')
-            )
+            cur.execute(f"INSERT INTO t_p18253922_infinite_business_ca.user_subscriptions (user_id, plan_id, status) VALUES ({user['id']}, 1, 'active')")
             
             conn.commit()
             
@@ -84,8 +81,8 @@ def handler(event, context):
             }
         
         elif action == 'login':
-            email = body.get('email')
-            password = body.get('password')
+            email = body.get('email', '').replace("'", "''")
+            password = body.get('password', '')
             
             if not email or not password:
                 return {
@@ -97,13 +94,10 @@ def handler(event, context):
             
             password_hash = hashlib.sha256(password.encode()).hexdigest()
             
-            cur.execute(
-                "SELECT id, email, name FROM t_p18253922_infinite_business_ca.users WHERE email = %s AND password_hash = %s",
-                (email, password_hash)
-            )
-            user = cur.fetchone()
+            cur.execute(f"SELECT id, email, name FROM t_p18253922_infinite_business_ca.users WHERE email = '{email}' AND password_hash = '{password_hash}'")
+            result = cur.fetchone()
             
-            if not user:
+            if not result:
                 return {
                     'statusCode': 401,
                     'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
@@ -111,7 +105,7 @@ def handler(event, context):
                     'isBase64Encoded': False
                 }
             
-            user = dict(user)
+            user = {'id': result[0], 'email': result[1], 'name': result[2]}
             
             token = jwt.encode(
                 {'user_id': user['id'], 'email': user['email'], 'exp': datetime.utcnow() + timedelta(days=30)},
@@ -135,6 +129,8 @@ def handler(event, context):
             }
     
     except psycopg2.IntegrityError:
+        if conn:
+            conn.rollback()
         return {
             'statusCode': 409,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
@@ -143,6 +139,8 @@ def handler(event, context):
         }
     
     except Exception as e:
+        if conn:
+            conn.rollback()
         return {
             'statusCode': 500,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
@@ -151,7 +149,7 @@ def handler(event, context):
         }
     
     finally:
-        if 'cur' in locals():
+        if cur:
             cur.close()
-        if 'conn' in locals():
+        if conn:
             conn.close()
