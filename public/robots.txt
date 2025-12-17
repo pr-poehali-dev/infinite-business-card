@@ -1,16 +1,39 @@
+# robots.txt для Infinite Business Card
+
+# Разрешить всем поисковикам
+User-agent: *
+Allow: /
+Allow: /card/*
+
+# Запретить служебные страницы
+Disallow: /yookassa-setup
+Disallow: /test-ai
+Disallow: /payment/*
+
+# Российские поисковики
+User-agent: Yandex
+Allow: /
+
+User-agent: Mail.RU_Bot
+Allow: /
+
+# Международные поисковики
 User-agent: Googlebot
 Allow: /
 
 User-agent: Bingbot
 Allow: /
 
+# Социальные сети
 User-agent: Twitterbot
 Allow: /
 
 User-agent: facebookexternalhit
 Allow: /
 
-User-agent: *
-Allow: /
-
+# Sitemap
 Sitemap: https://functions.poehali.dev/04529237-fe25-4b58-9773-8ac02ad2cd2d
+Sitemap: https://visitka.site/sitemap.xml
+
+# Crawl-delay для защиты от нагрузки
+Crawl-delay: 1
