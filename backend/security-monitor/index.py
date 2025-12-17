@@ -2,8 +2,11 @@ import json
 import os
 import time
 import requests
+import smtplib
 from datetime import datetime
 from typing import Dict, List, Any
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 def handler(event, context):
     '''
@@ -101,6 +104,10 @@ def handler(event, context):
     else:
         results['security_score'] = 0
         results['status'] = 'unknown'
+    
+    # Отправка уведомления при низком уровне безопасности
+    if results['security_score'] < 75 or results['failed'] > 0:
+        send_alert_email(results)
     
     return {
         'statusCode': 200,
@@ -517,3 +524,97 @@ def check_leads_security(url: str) -> Dict[str, Any]:
         result['warnings'] += 1
     
     return result
+
+
+def send_alert_email(results: Dict[str, Any]) -> None:
+    '''Отправка email уведомления при проблемах безопасности'''
+    
+    smtp_host = os.environ.get('SMTP_HOST')
+    smtp_port = int(os.environ.get('SMTP_PORT', '465'))
+    smtp_user = os.environ.get('SMTP_USER')
+    smtp_password = os.environ.get('SMTP_PASSWORD')
+    admin_email = os.environ.get('ADMIN_EMAIL')
+    
+    # Если SMTP не настроен - пропускаем
+    if not all([smtp_host, smtp_user, smtp_password, admin_email]):
+        return
+    
+    try:
+        # Формируем статус и цвет
+        status = results['status']
+        status_emoji = {
+            'excellent': '🌟',
+            'good': '✅',
+            'needs_improvement': '⚠️',
+            'critical': '🚨'
+        }.get(status, '❓')
+        
+        status_color = {
+            'excellent': '#28a745',
+            'good': '#17a2b8',
+            'needs_improvement': '#ffc107',
+            'critical': '#dc3545'
+        }.get(status, '#6c757d')
+        
+        # Собираем список проблем
+        problems = []
+        for func_name, func_data in results['functions'].items():
+            for check in func_data['checks']:
+                if check['status'] in ['failed', 'warning']:
+                    icon = '❌' if check['status'] == 'failed' else '⚠️'
+                    problems.append(f"{icon} {func_name}: {check['name']} - {check['message']}")
+        
+        # Формируем HTML письмо
+        html_content = f"""
+        <html>
+          <body style="font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;">
+            <div style="max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 10px;">
+              <h1 style="color: {status_color}; margin-bottom: 20px;">
+                {status_emoji} Security Monitor Alert
+              </h1>
+              
+              <div style="background: #f9f9f9; padding: 20px; border-radius: 5px; margin: 20px 0;">
+                <h2 style="margin: 0 0 10px 0; color: #333;">Уровень безопасности: {results['security_score']}%</h2>
+                <p style="margin: 5px 0; color: #666;"><strong>Статус:</strong> {status}</p>
+                <p style="margin: 5px 0; color: #666;"><strong>Проверок пройдено:</strong> {results['passed']}/{results['total_checks']}</p>
+                <p style="margin: 5px 0; color: #666;"><strong>Предупреждений:</strong> {results['warnings']}</p>
+                <p style="margin: 5px 0; color: #666;"><strong>Ошибок:</strong> {results['failed']}</p>
+                <p style="margin: 5px 0; color: #999; font-size: 14px;"><strong>Время проверки:</strong> {results['timestamp']}</p>
+              </div>
+              
+              <h3 style="color: #333; margin-top: 30px;">Обнаруженные проблемы:</h3>
+              <ul style="color: #666; line-height: 1.8;">
+                {''.join([f'<li>{problem}</li>' for problem in problems]) if problems else '<li>Нет критичных проблем</li>'}
+              </ul>
+              
+              <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                <p style="color: #999; font-size: 14px;">
+                  Это автоматическое уведомление от системы мониторинга безопасности.<br>
+                  Проверка выполняется автоматически при каждом запросе к security-monitor функции.
+                </p>
+              </div>
+            </div>
+          </body>
+        </html>
+        """
+        
+        # Создаем письмо
+        msg = MIMEMultipart('alternative')
+        msg['From'] = smtp_user
+        msg['To'] = admin_email
+        msg['Subject'] = f'{status_emoji} Security Alert: {results["security_score"]}% | {results["failed"]} Failed'
+        msg.attach(MIMEText(html_content, 'html'))
+        
+        # Отправляем
+        if smtp_port == 465:
+            server = smtplib.SMTP_SSL(smtp_host, smtp_port)
+        else:
+            server = smtplib.SMTP(smtp_host, smtp_port)
+            server.starttls()
+        
+        server.login(smtp_user, smtp_password)
+        server.send_message(msg)
+        server.quit()
+        
+    except Exception:
+        pass
