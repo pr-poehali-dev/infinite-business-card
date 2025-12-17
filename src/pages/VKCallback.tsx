@@ -56,15 +56,28 @@ const VKCallback = () => {
         localStorage.setItem('auth_token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
 
-        toast({
-          title: 'Успешная авторизация',
-          description: `Добро пожаловать, ${data.user.name}!`,
-        });
+        // Показываем разные сообщения для новых и существующих пользователей
+        if (data.is_new_user) {
+          toast({
+            title: '🎉 Добро пожаловать!',
+            description: `Мы создали для вас визитку: visitka.site/${data.card_slug}`,
+          });
+        } else {
+          toast({
+            title: 'С возвращением!',
+            description: `Рады видеть вас снова, ${data.user.name}!`,
+          });
+        }
 
+        // Перенаправляем на визитку если есть slug
         setTimeout(() => {
-          navigate('/');
+          if (data.card_slug) {
+            navigate(`/${data.card_slug}`);
+          } else {
+            navigate('/');
+          }
           window.location.reload();
-        }, 1000);
+        }, 1500);
 
       } catch (err: any) {
         console.error('VK auth error:', err);

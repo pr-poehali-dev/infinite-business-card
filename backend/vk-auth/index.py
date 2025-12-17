@@ -107,9 +107,11 @@ def handler(event, context):
         )
         existing_user = cur.fetchone()
         
+        is_new_user = False
         if existing_user:
             user_id = existing_user[0]
         else:
+            is_new_user = True
             if not vk_email:
                 vk_email = f"vk{vk_user_id}@visitka.site"
             
@@ -122,6 +124,16 @@ def handler(event, context):
                 f"INSERT INTO t_p18253922_infinite_business_ca.users (email, name, vk_id, created_at) VALUES ('{vk_email_escaped}', '{full_name_escaped}', '{vk_user_id_escaped}', '{created_at}') RETURNING id"
             )
             user_id = cur.fetchone()[0]
+            
+            # Создаём визитку для нового пользователя
+            card_slug = f"vk{vk_user_id}"
+            photo_url = vk_user.get('photo_200', '')
+            photo_url_escaped = photo_url.replace("'", "''")
+            
+            cur.execute(
+                f"INSERT INTO t_p18253922_infinite_business_ca.cards (user_id, slug, name, photo_url, created_at, is_active) VALUES ({user_id}, '{card_slug}', '{full_name_escaped}', '{photo_url_escaped}', '{created_at}', true) RETURNING id"
+            )
+            card_id = cur.fetchone()[0]
         
         expires_at = datetime.utcnow() + timedelta(days=30)
         
@@ -142,6 +154,13 @@ def handler(event, context):
             algorithm='HS256'
         )
         
+        # Получаем slug визитки пользователя
+        cur.execute(
+            f"SELECT slug FROM t_p18253922_infinite_business_ca.cards WHERE user_id = {user_id} AND is_active = true ORDER BY created_at DESC LIMIT 1"
+        )
+        card_result = cur.fetchone()
+        card_slug = card_result[0] if card_result else None
+        
         conn.commit()
         cur.close()
         conn.close()
@@ -155,7 +174,9 @@ def handler(event, context):
                     'id': user_id,
                     'email': vk_email,
                     'name': full_name
-                }
+                },
+                'card_slug': card_slug,
+                'is_new_user': is_new_user
             }),
             'isBase64Encoded': False
         }
