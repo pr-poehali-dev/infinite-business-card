@@ -1,10 +1,30 @@
 import json
 import os
+import re
 import bcrypt
 import hashlib
 import jwt
+import time
 from datetime import datetime, timedelta
+from typing import Dict, Tuple, Optional
 import psycopg2
+
+# In-memory rate limiting
+_rate_limit_store: Dict[str, list] = {}
+
+def check_rate_limit(identifier: str, max_req: int = 5, window: int = 60) -> Tuple[bool, Optional[int]]:
+    current = time.time()
+    if identifier not in _rate_limit_store:
+        _rate_limit_store[identifier] = []
+    
+    _rate_limit_store[identifier] = [t for t in _rate_limit_store[identifier] if current - t < window]
+    
+    if len(_rate_limit_store[identifier]) >= max_req:
+        oldest = _rate_limit_store[identifier][0]
+        return False, int(window - (current - oldest))
+    
+    _rate_limit_store[identifier].append(current)
+    return True, None
 
 def handler(event, context):
     '''
@@ -35,6 +55,22 @@ def handler(event, context):
             'isBase64Encoded': False
         }
     
+    # Rate limiting по IP
+    ip = event.get('requestContext', {}).get('identity', {}).get('sourceIp', 'unknown')
+    allowed, retry_after = check_rate_limit(f'auth:{ip}', max_req=5, window=60)
+    
+    if not allowed:
+        return {
+            'statusCode': 429,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Content-Type': 'application/json',
+                'Retry-After': str(retry_after)
+            },
+            'body': json.dumps({'error': 'Too many requests'}),
+            'isBase64Encoded': False
+        }
+    
     conn = None
     cur = None
     
@@ -50,11 +86,39 @@ def handler(event, context):
             password = body.get('password', '')
             name = body.get('name', '')
             
-            if not email or not password or not name:
+            # Валидация email
+            if not email or len(email) > 255:
                 return {
                     'statusCode': 400,
                     'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                    'body': json.dumps({'error': 'Email, password and name are required'}),
+                    'body': json.dumps({'error': 'Invalid email'}),
+                    'isBase64Encoded': False
+                }
+            
+            email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+            if not re.match(email_pattern, email):
+                return {
+                    'statusCode': 400,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'error': 'Invalid email format'}),
+                    'isBase64Encoded': False
+                }
+            
+            # Валидация пароля
+            if not password or len(password) < 6 or len(password) > 100:
+                return {
+                    'statusCode': 400,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'error': 'Password must be 6-100 chars'}),
+                    'isBase64Encoded': False
+                }
+            
+            # Валидация имени
+            if not name or len(name) < 2 or len(name) > 100:
+                return {
+                    'statusCode': 400,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'error': 'Name must be 2-100 chars'}),
                     'isBase64Encoded': False
                 }
             
@@ -92,6 +156,8 @@ def handler(event, context):
             password = body.get('password', '')
             
             if not email or not password:
+                cur.close()
+                conn.close()
                 return {
                     'statusCode': 400,
                     'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
@@ -106,6 +172,8 @@ def handler(event, context):
             result = cur.fetchone()
             
             if not result:
+                cur.close()
+                conn.close()
                 return {
                     'statusCode': 401,
                     'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
@@ -134,6 +202,8 @@ def handler(event, context):
                     conn.commit()
             
             if not is_valid:
+                cur.close()
+                conn.close()
                 return {
                     'statusCode': 401,
                     'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
@@ -143,9 +213,20 @@ def handler(event, context):
             
             user = {'id': result[0], 'email': result[1], 'name': result[2]}
             
+            jwt_secret = os.environ.get('JWT_SECRET')
+            if not jwt_secret:
+                cur.close()
+                conn.close()
+                return {
+                    'statusCode': 500,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'error': 'Server configuration error'}),
+                    'isBase64Encoded': False
+                }
+            
             token = jwt.encode(
                 {'user_id': user['id'], 'email': user['email'], 'exp': datetime.utcnow() + timedelta(days=30)},
-                os.environ.get('JWT_SECRET', 'fallback_secret_for_dev'),
+                jwt_secret,
                 algorithm='HS256'
             )
             
@@ -174,13 +255,23 @@ def handler(event, context):
             'isBase64Encoded': False
         }
     
-    except Exception as e:
+    except jwt.PyJWTError:
         if conn:
             conn.rollback()
         return {
             'statusCode': 500,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': str(e)}),
+            'body': json.dumps({'error': 'Token generation failed'}),
+            'isBase64Encoded': False
+        }
+    
+    except Exception:
+        if conn:
+            conn.rollback()
+        return {
+            'statusCode': 500,
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+            'body': json.dumps({'error': 'Authentication failed'}),
             'isBase64Encoded': False
         }
     

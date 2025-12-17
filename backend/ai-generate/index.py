@@ -5,6 +5,24 @@ import boto3
 import requests
 import uuid
 import time
+from typing import Dict, Tuple, Optional
+
+# In-memory rate limiting
+_rate_limit_store: Dict[str, list] = {}
+
+def check_rate_limit(identifier: str, max_req: int = 5, window: int = 300) -> Tuple[bool, Optional[int]]:
+    current = time.time()
+    if identifier not in _rate_limit_store:
+        _rate_limit_store[identifier] = []
+    
+    _rate_limit_store[identifier] = [t for t in _rate_limit_store[identifier] if current - t < window]
+    
+    if len(_rate_limit_store[identifier]) >= max_req:
+        oldest = _rate_limit_store[identifier][0]
+        return False, int(window - (current - oldest))
+    
+    _rate_limit_store[identifier].append(current)
+    return True, None
 
 def handler(event, context):
     '''
@@ -47,6 +65,21 @@ def handler(event, context):
                 'isBase64Encoded': False
             }
         
+        # Rate limiting - 5 запросов в 5 минут (дорогая операция)
+        allowed, retry_after = check_rate_limit(f'ai:{user_id}', max_req=5, window=300)
+        
+        if not allowed:
+            return {
+                'statusCode': 429,
+                'headers': {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json',
+                    'Retry-After': str(retry_after)
+                },
+                'body': json.dumps({'error': 'Too many AI requests'}),
+                'isBase64Encoded': False
+            }
+        
         body = json.loads(event.get('body', '{}'))
         prompt = body.get('prompt')
         
@@ -55,6 +88,15 @@ def handler(event, context):
                 'statusCode': 400,
                 'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
                 'body': json.dumps({'error': 'Prompt is required'}),
+                'isBase64Encoded': False
+            }
+        
+        # Валидация длины промпта
+        if len(prompt) > 500:
+            return {
+                'statusCode': 400,
+                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                'body': json.dumps({'error': 'Prompt too long (max 500 chars)'}),
                 'isBase64Encoded': False
             }
         
@@ -69,7 +111,8 @@ def handler(event, context):
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             data={'scope': 'GIGACHAT_API_PERS'},
-            verify=False
+            verify=True,
+            timeout=10
         )
         
         access_token = auth_response.json()['access_token']
@@ -93,7 +136,8 @@ def handler(event, context):
                 ],
                 'function_call': 'text2image'
             },
-            verify=False
+            verify=True,
+            timeout=30
         )
         
         result = generation_response.json()
@@ -139,10 +183,24 @@ def handler(event, context):
             'isBase64Encoded': False
         }
     
-    except Exception as e:
+    except requests.exceptions.Timeout:
+        return {
+            'statusCode': 504,
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+            'body': json.dumps({'error': 'AI service timeout'}),
+            'isBase64Encoded': False
+        }
+    except requests.exceptions.RequestException:
+        return {
+            'statusCode': 502,
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+            'body': json.dumps({'error': 'AI service unavailable'}),
+            'isBase64Encoded': False
+        }
+    except Exception:
         return {
             'statusCode': 500,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': str(e)}),
+            'body': json.dumps({'error': 'Image generation failed'}),
             'isBase64Encoded': False
         }

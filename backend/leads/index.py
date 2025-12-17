@@ -1,7 +1,27 @@
 import json
 import os
+import re
+import time
+from typing import Dict, Tuple, Optional
 import psycopg2
 from psycopg2.extras import RealDictCursor
+
+# In-memory rate limiting
+_rate_limit_store: Dict[str, list] = {}
+
+def check_rate_limit(identifier: str, max_req: int = 10, window: int = 60) -> Tuple[bool, Optional[int]]:
+    current = time.time()
+    if identifier not in _rate_limit_store:
+        _rate_limit_store[identifier] = []
+    
+    _rate_limit_store[identifier] = [t for t in _rate_limit_store[identifier] if current - t < window]
+    
+    if len(_rate_limit_store[identifier]) >= max_req:
+        oldest = _rate_limit_store[identifier][0]
+        return False, int(window - (current - oldest))
+    
+    _rate_limit_store[identifier].append(current)
+    return True, None
 
 def handler(event, context):
     '''
@@ -27,6 +47,23 @@ def handler(event, context):
             'isBase64Encoded': False
         }
     
+    # Rate limiting для публичного создания лидов
+    if method == 'POST' and not lead_id:
+        ip = event.get('requestContext', {}).get('identity', {}).get('sourceIp', 'unknown')
+        allowed, retry_after = check_rate_limit(f'leads:{ip}', max_req=3, window=60)
+        
+        if not allowed:
+            return {
+                'statusCode': 429,
+                'headers': {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json',
+                    'Retry-After': str(retry_after)
+                },
+                'body': json.dumps({'error': 'Too many requests'}),
+                'isBase64Encoded': False
+            }
+    
     try:
         conn = psycopg2.connect(os.environ['DATABASE_URL'])
         cur = conn.cursor(cursor_factory=RealDictCursor)
@@ -42,19 +79,59 @@ def handler(event, context):
             message = body.get('message', '')
             source = body.get('source', 'direct')
             
-            if not card_id or not name:
+            # Валидация имени
+            if not name or len(name) < 2 or len(name) > 100:
                 return {
                     'statusCode': 400,
                     'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-                    'body': json.dumps({'error': 'card_id and name are required'}),
+                    'body': json.dumps({'error': 'Name must be 2-100 chars'}),
                     'isBase64Encoded': False
                 }
             
+            # Валидация email (если указан)
+            if email:
+                if len(email) > 255 or not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email):
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                        'body': json.dumps({'error': 'Invalid email format'}),
+                        'isBase64Encoded': False
+                    }
+            
+            # Валидация телефона (если указан)
+            if phone:
+                clean_phone = re.sub(r'[^\d+]', '', phone)
+                if len(clean_phone) < 10 or len(clean_phone) > 15:
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                        'body': json.dumps({'error': 'Invalid phone format'}),
+                        'isBase64Encoded': False
+                    }
+            
+            # Должен быть либо email, либо телефон
             if not email and not phone:
                 return {
                     'statusCode': 400,
                     'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
                     'body': json.dumps({'error': 'Either email or phone is required'}),
+                    'isBase64Encoded': False
+                }
+            
+            # Валидация сообщения
+            if len(message) > 1000:
+                return {
+                    'statusCode': 400,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'error': 'Message too long (max 1000 chars)'}),
+                    'isBase64Encoded': False
+                }
+            
+            if not card_id:
+                return {
+                    'statusCode': 400,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'error': 'card_id required'}),
                     'isBase64Encoded': False
                 }
             

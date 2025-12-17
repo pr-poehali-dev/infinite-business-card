@@ -117,15 +117,22 @@ def handler(event, context):
             )
             user_id = cur.fetchone()[0]
         
-        token = secrets.token_urlsafe(32)
-        expires_at = datetime.now() + timedelta(days=30)
+        expires_at = datetime.utcnow() + timedelta(days=30)
         
-        # VK auth doesn't need token update, using JWT instead
-        import jwt
+        jwt_secret = os.environ.get('JWT_SECRET')
+        if not jwt_secret:
+            cur.close()
+            conn.close()
+            return {
+                'statusCode': 500,
+                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                'body': json.dumps({'error': 'Server configuration error'}),
+                'isBase64Encoded': False
+            }
         
         token = jwt.encode(
             {'user_id': user_id, 'email': vk_email, 'exp': expires_at},
-            'secret_key_change_in_production',
+            jwt_secret,
             algorithm='HS256'
         )
         

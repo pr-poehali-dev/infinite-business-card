@@ -1,15 +1,16 @@
 {
   "tests": [
     {
-      "name": "Missing required fields",
+      "name": "Missing auth token",
       "method": "POST",
       "path": "/",
       "body": {
+        "to_email": "test@test.com",
         "subject": "Test"
       },
-      "expectedStatus": 400,
+      "expectedStatus": 401,
       "expectedBody": {
-        "error": "to_email and subject are required"
+        "error": "Unauthorized - token required"
       }
     }
   ]
