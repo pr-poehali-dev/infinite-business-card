@@ -1,5 +1,6 @@
 import json
 import os
+import bcrypt
 import hashlib
 import jwt
 from datetime import datetime, timedelta
@@ -45,9 +46,9 @@ def handler(event, context):
         cur = conn.cursor()
         
         if action == 'register':
-            email = body.get('email', '').replace("'", "''")
+            email = body.get('email', '')
             password = body.get('password', '')
-            name = body.get('name', '').replace("'", "''")
+            name = body.get('name', '')
             
             if not email or not password or not name:
                 return {
@@ -57,19 +58,25 @@ def handler(event, context):
                     'isBase64Encoded': False
                 }
             
-            password_hash = hashlib.sha256(password.encode()).hexdigest()
+            password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             
-            cur.execute(f"INSERT INTO t_p18253922_infinite_business_ca.users (email, password_hash, name) VALUES ('{email}', '{password_hash}', '{name}') RETURNING id, email, name")
+            cur.execute(
+                "INSERT INTO t_p18253922_infinite_business_ca.users (email, password_hash, name) VALUES (%s, %s, %s) RETURNING id, email, name",
+                (email, password_hash, name)
+            )
             result = cur.fetchone()
             user = {'id': result[0], 'email': result[1], 'name': result[2]}
             
-            cur.execute(f"INSERT INTO t_p18253922_infinite_business_ca.user_subscriptions (user_id, plan_id, status) VALUES ({user['id']}, 1, 'active')")
+            cur.execute(
+                "INSERT INTO t_p18253922_infinite_business_ca.user_subscriptions (user_id, plan_id, status) VALUES (%s, %s, %s)",
+                (user['id'], 1, 'active')
+            )
             
             conn.commit()
             
             token = jwt.encode(
                 {'user_id': user['id'], 'email': user['email'], 'exp': datetime.utcnow() + timedelta(days=30)},
-                'secret_key_change_in_production',
+                os.environ.get('JWT_SECRET', 'fallback_secret_for_dev'),
                 algorithm='HS256'
             )
             
@@ -81,7 +88,7 @@ def handler(event, context):
             }
         
         elif action == 'login':
-            email = body.get('email', '').replace("'", "''")
+            email = body.get('email', '')
             password = body.get('password', '')
             
             if not email or not password:
@@ -92,12 +99,41 @@ def handler(event, context):
                     'isBase64Encoded': False
                 }
             
-            password_hash = hashlib.sha256(password.encode()).hexdigest()
-            
-            cur.execute(f"SELECT id, email, name FROM t_p18253922_infinite_business_ca.users WHERE email = '{email}' AND password_hash = '{password_hash}'")
+            cur.execute(
+                "SELECT id, email, name, password_hash FROM t_p18253922_infinite_business_ca.users WHERE email = %s",
+                (email,)
+            )
             result = cur.fetchone()
             
             if not result:
+                return {
+                    'statusCode': 401,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'error': 'Invalid credentials'}),
+                    'isBase64Encoded': False
+                }
+            
+            stored_hash = result[3]
+            is_valid = False
+            
+            # Проверка bcrypt хеша
+            if stored_hash.startswith('$2b$'):
+                is_valid = bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8'))
+            # Проверка старого SHA256 хеша (backward compatibility)
+            else:
+                sha256_hash = hashlib.sha256(password.encode()).hexdigest()
+                is_valid = (sha256_hash == stored_hash)
+                
+                # Если пароль верный - обновляем на bcrypt
+                if is_valid:
+                    new_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+                    cur.execute(
+                        "UPDATE t_p18253922_infinite_business_ca.users SET password_hash = %s WHERE id = %s",
+                        (new_hash, result[0])
+                    )
+                    conn.commit()
+            
+            if not is_valid:
                 return {
                     'statusCode': 401,
                     'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
@@ -109,7 +145,7 @@ def handler(event, context):
             
             token = jwt.encode(
                 {'user_id': user['id'], 'email': user['email'], 'exp': datetime.utcnow() + timedelta(days=30)},
-                'secret_key_change_in_production',
+                os.environ.get('JWT_SECRET', 'fallback_secret_for_dev'),
                 algorithm='HS256'
             )
             

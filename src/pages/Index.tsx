@@ -24,6 +24,7 @@ const Index = () => {
   const [selectedPlan, setSelectedPlan] = useState<{ name: string; price: string } | null>(null);
   const [demoPlan, setDemoPlan] = useState<'free' | 'basic' | 'pro'>('basic');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (api.isAuthenticated()) {
@@ -118,7 +119,7 @@ const Index = () => {
             <a href="#faq" className="hover:text-blue transition-colors font-medium">FAQ</a>
             <a href="#contacts" className="hover:text-green transition-colors font-medium">Контакты</a>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-4">
             <Button variant="ghost" className="hover:text-blue" onClick={handleOpenDemoDialog}>
               <Icon name="PlayCircle" className="mr-2" size={18} />
               Демо
@@ -128,7 +129,88 @@ const Index = () => {
               Регистрация
             </Button>
           </div>
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="md:hidden"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            <Icon name={mobileMenuOpen ? "X" : "Menu"} size={24} />
+          </Button>
         </nav>
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-background/95 backdrop-blur-lg border-b border-border">
+            <div className="container mx-auto px-4 py-4 flex flex-col gap-4">
+              <a 
+                href="#features" 
+                className="hover:text-green transition-colors font-medium py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Возможности
+              </a>
+              <a 
+                href="#solutions" 
+                className="hover:text-blue transition-colors font-medium py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Решения
+              </a>
+              <a 
+                href="#pricing" 
+                className="hover:text-green transition-colors font-medium py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Тарифы
+              </a>
+              <a 
+                href="#faq" 
+                className="hover:text-blue transition-colors font-medium py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                FAQ
+              </a>
+              <a 
+                href="#contacts" 
+                className="hover:text-green transition-colors font-medium py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Контакты
+              </a>
+              <div className="flex flex-col gap-2 pt-2 border-t border-border">
+                <Button 
+                  variant="ghost" 
+                  className="hover:text-blue w-full justify-start" 
+                  onClick={() => {
+                    handleOpenDemoDialog();
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <Icon name="PlayCircle" className="mr-2" size={18} />
+                  Демо
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="hover:text-green w-full justify-start" 
+                  onClick={() => {
+                    handleOpenAuth();
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  Войти
+                </Button>
+                <Button 
+                  className="gradient-bg text-white hover:opacity-90 shadow-lg shadow-blue/30 hover:shadow-green/50 w-full" 
+                  onClick={() => {
+                    handleOpenAuth();
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  Регистрация
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       <main className="pt-20">

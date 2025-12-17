@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://infinite7.cards/sitemap.xml
+Sitemap: https://functions.poehali.dev/04529237-fe25-4b58-9773-8ac02ad2cd2d

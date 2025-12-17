@@ -100,13 +100,13 @@ def handler(event, context):
             
             yukassa_data = yukassa_response.json()
             
-            escaped_metadata = json.dumps(yukassa_data).replace("'", "''")
-            cur.execute(f"""
+            metadata_json = json.dumps(yukassa_data)
+            cur.execute("""
                 INSERT INTO t_p18253922_infinite_business_ca.payments 
                 (user_id, amount, payment_type, payment_provider, provider_payment_id, status, metadata)
-                VALUES ({user_id}, {amount}, '{payment_type}', 'yukassa', '{yukassa_data.get('id')}', '{yukassa_data.get('status')}', '{escaped_metadata}')
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
                 RETURNING id, user_id, amount, payment_type, payment_provider, provider_payment_id, status, created_at
-            """)
+            """, (user_id, amount, payment_type, 'yukassa', yukassa_data.get('id'), yukassa_data.get('status'), metadata_json))
             result = cur.fetchone()
             payment = {
                 'id': result[0],
@@ -142,7 +142,10 @@ def handler(event, context):
                     'isBase64Encoded': False
                 }
             
-            cur.execute(f"SELECT id, user_id, amount, payment_type, status, created_at FROM t_p18253922_infinite_business_ca.payments WHERE id = {payment_id}")
+            cur.execute(
+                "SELECT id, user_id, amount, payment_type, status, created_at FROM t_p18253922_infinite_business_ca.payments WHERE id = %s",
+                (payment_id,)
+            )
             result = cur.fetchone()
             
             if not result:
