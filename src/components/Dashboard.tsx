@@ -24,6 +24,7 @@ import HelpButton from './HelpButton';
 import ProgressTracker from './ProgressTracker';
 import SettingsTab from './dashboard/SettingsTab';
 import SubscriptionTab from './dashboard/SubscriptionTab';
+import SystemHealthTab from './dashboard/SystemHealthTab';
 
 interface DashboardProps {
   onLogout: () => void;
@@ -161,6 +162,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
               <Icon name="Settings" size={18} />
               <span className="ml-2">Настройки</span>
             </TabsTrigger>
+            <TabsTrigger value="health" className="flex-shrink-0">
+              <Icon name="Activity" size={18} />
+              <span className="ml-2">Система</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="card" className="space-y-6">
@@ -213,6 +218,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
 
           <TabsContent value="settings" className="space-y-6">
             <SettingsTab />
+          </TabsContent>
+
+          <TabsContent value="health" className="space-y-6">
+            <SystemHealthTab />
           </TabsContent>
         </Tabs>
       </main>
