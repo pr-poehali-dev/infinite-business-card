@@ -1,0 +1,35 @@
+{
+  "tests": [
+    {
+      "name": "Missing authorization",
+      "method": "PUT",
+      "path": "/",
+      "body": {
+        "slug": "test",
+        "name": "Test"
+      },
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Invalid token",
+      "method": "PUT",
+      "path": "/",
+      "headers": {
+        "X-Auth-Token": "invalid-token"
+      },
+      "body": {
+        "slug": "test",
+        "name": "Test"
+      },
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

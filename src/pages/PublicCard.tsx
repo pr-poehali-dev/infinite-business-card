@@ -31,6 +31,10 @@ const PublicCard = () => {
   const [showLeadForm, setShowLeadForm] = useState(false);
   const [leadForm, setLeadForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [submittingLead, setSubmittingLead] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editForm, setEditForm] = useState<CardData | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     const fetchCard = async () => {
@@ -48,6 +52,15 @@ const PublicCard = () => {
 
         const data = await response.json();
         setCard(data.card);
+        setEditForm(data.card);
+        
+        // Проверяем владельца
+        const authToken = localStorage.getItem('auth_token');
+        const user = localStorage.getItem('user');
+        if (authToken && user) {
+          const userData = JSON.parse(user);
+          setIsOwner(data.card.user_id === userData.id);
+        }
         
         // Track view
         await fetch(`https://functions.poehali.dev/1b1c5f28-bcb7-48d0-9437-b01ccc89239f/${id}/view`, {
@@ -130,6 +143,53 @@ const PublicCard = () => {
     }
   };
 
+  const handleEditToggle = () => {
+    if (isEditMode) {
+      setEditForm(card);
+    }
+    setIsEditMode(!isEditMode);
+  };
+
+  const handleSaveCard = async () => {
+    if (!editForm) return;
+    
+    setSaving(true);
+    try {
+      const authToken = localStorage.getItem('auth_token');
+      const response = await fetch('https://functions.poehali.dev/d7834eac-8ea2-4b8d-a22a-fe2cd24b3a93', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Token': authToken || ''
+        },
+        body: JSON.stringify({
+          slug: id,
+          name: editForm.name,
+          position: editForm.position || '',
+          company: editForm.company || '',
+          phone: editForm.phone || '',
+          email: editForm.email || '',
+          website: editForm.website || '',
+          description: editForm.description || ''
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Ошибка сохранения');
+      }
+
+      const data = await response.json();
+      setCard(data.card);
+      setEditForm(data.card);
+      setIsEditMode(false);
+      toast.success('Визитка обновлена!');
+    } catch (error) {
+      toast.error('Не удалось сохранить изменения');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-gold/5">
@@ -174,10 +234,23 @@ const PublicCard = () => {
             <div className="flex items-center justify-center mb-4">
               <Logo size="md" />
             </div>
-            <Badge variant="outline" className="border-gold/50 text-gold/80">
-              <Icon name="Eye" size={14} className="mr-1" />
-              {card.view_count} просмотров
-            </Badge>
+            <div className="flex items-center justify-center gap-3">
+              <Badge variant="outline" className="border-gold/50 text-gold/80">
+                <Icon name="Eye" size={14} className="mr-1" />
+                {card.view_count} просмотров
+              </Badge>
+              {isOwner && (
+                <Button 
+                  variant={isEditMode ? "destructive" : "outline"}
+                  size="sm"
+                  onClick={handleEditToggle}
+                  className={isEditMode ? "" : "border-gold/50 text-gold/80 hover:bg-gold/10"}
+                >
+                  <Icon name={isEditMode ? "X" : "Edit"} size={14} className="mr-1" />
+                  {isEditMode ? 'Отмена' : 'Редактировать'}
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Main Card */}
@@ -201,25 +274,111 @@ const PublicCard = () => {
 
             {/* Info Section */}
             <div className="p-8 space-y-6">
-              {/* Name & Position */}
-              <div className="text-center">
-                <h1 className="text-3xl font-bold mb-2">{card.name}</h1>
-                {card.position && (
-                  <p className="text-xl text-gold mb-1">{card.position}</p>
-                )}
-                {card.company && (
-                  <p className="text-lg text-muted-foreground">{card.company}</p>
-                )}
-              </div>
+              {isEditMode && editForm ? (
+                <>
+                  {/* Edit Form */}
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Имя</label>
+                      <Input
+                        value={editForm.name}
+                        onChange={(e) => setEditForm({...editForm, name: e.target.value})}
+                        placeholder="Ваше имя"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Должность</label>
+                      <Input
+                        value={editForm.position || ''}
+                        onChange={(e) => setEditForm({...editForm, position: e.target.value})}
+                        placeholder="Должность"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Компания</label>
+                      <Input
+                        value={editForm.company || ''}
+                        onChange={(e) => setEditForm({...editForm, company: e.target.value})}
+                        placeholder="Компания"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Телефон</label>
+                      <Input
+                        value={editForm.phone || ''}
+                        onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
+                        placeholder="+7 999 123-45-67"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Email</label>
+                      <Input
+                        type="email"
+                        value={editForm.email || ''}
+                        onChange={(e) => setEditForm({...editForm, email: e.target.value})}
+                        placeholder="email@example.com"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Сайт</label>
+                      <Input
+                        value={editForm.website || ''}
+                        onChange={(e) => setEditForm({...editForm, website: e.target.value})}
+                        placeholder="example.com"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">О себе</label>
+                      <Textarea
+                        value={editForm.description || ''}
+                        onChange={(e) => setEditForm({...editForm, description: e.target.value})}
+                        placeholder="Расскажите о себе"
+                        rows={4}
+                      />
+                    </div>
+                    <Button 
+                      onClick={handleSaveCard} 
+                      disabled={saving}
+                      className="w-full bg-gold hover:bg-gold/90 text-black font-semibold"
+                    >
+                      {saving ? (
+                        <>
+                          <Icon name="Loader2" className="mr-2 animate-spin" size={16} />
+                          Сохранение...
+                        </>
+                      ) : (
+                        <>
+                          <Icon name="Save" className="mr-2" size={16} />
+                          Сохранить изменения
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Name & Position */}
+                  <div className="text-center">
+                    <h1 className="text-3xl font-bold mb-2">{card.name}</h1>
+                    {card.position && (
+                      <p className="text-xl text-gold mb-1">{card.position}</p>
+                    )}
+                    {card.company && (
+                      <p className="text-lg text-muted-foreground">{card.company}</p>
+                    )}
+                  </div>
 
-              {/* Description */}
-              {card.description && (
-                <div className="bg-muted/30 rounded-lg p-4 text-center">
-                  <p className="text-foreground/90">{card.description}</p>
-                </div>
+                  {/* Description */}
+                  {card.description && (
+                    <div className="bg-muted/30 rounded-lg p-4 text-center">
+                      <p className="text-foreground/90">{card.description}</p>
+                    </div>
+                  )}
+                </>
               )}
 
               {/* Contact Buttons */}
+              {!isEditMode && (
               <div className="grid grid-cols-1 gap-3">
                 {card.phone && (
                   <Button
@@ -253,8 +412,10 @@ const PublicCard = () => {
                   </Button>
                 )}
               </div>
+              )}
 
               {/* Share Button */}
+              {!isEditMode && (
               <Button
                 onClick={shareCard}
                 variant="ghost"
@@ -263,6 +424,7 @@ const PublicCard = () => {
                 <Icon name="Share2" className="mr-2" size={18} />
                 Поделиться визиткой
               </Button>
+              )}
             </div>
           </Card>
 
