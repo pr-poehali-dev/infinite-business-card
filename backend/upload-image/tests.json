@@ -1,0 +1,31 @@
+{
+  "tests": [
+    {
+      "name": "Upload image with valid base64",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "image": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+        "content_type": "image/png"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "url": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Reject empty image",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "image": "",
+        "content_type": "image/jpeg"
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "No image provided"
+      }
+    }
+  ]
+}

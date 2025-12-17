@@ -137,7 +137,8 @@ const PublicCard = () => {
           phone: editForm.phone || '',
           email: editForm.email || '',
           website: editForm.website || '',
-          description: editForm.description || ''
+          description: editForm.description || '',
+          logo_url: editForm.logo_url || ''
         })
       });
 

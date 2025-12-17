@@ -126,6 +126,9 @@ def handler(event, context):
     if 'photo_url' in body:
         photo_url_escaped = body['photo_url'].replace("'", "''")
         update_fields.append(f"photo_url = '{photo_url_escaped}'")
+    if 'logo_url' in body:
+        logo_url_escaped = body['logo_url'].replace("'", "''")
+        update_fields.append(f"logo_url = '{logo_url_escaped}'")
     
     if not update_fields:
         cur.close()
@@ -144,7 +147,7 @@ def handler(event, context):
     conn.commit()
     
     cur.execute(
-        f"SELECT id, slug, name, position, company, phone, email, website, description, photo_url FROM t_p18253922_infinite_business_ca.cards WHERE slug = '{card_slug_escaped}'"
+        f"SELECT id, slug, name, position, company, phone, email, website, description, photo_url, logo_url FROM t_p18253922_infinite_business_ca.cards WHERE slug = '{card_slug_escaped}'"
     )
     updated_card = cur.fetchone()
     
@@ -166,7 +169,8 @@ def handler(event, context):
                 'email': updated_card[6],
                 'website': updated_card[7],
                 'description': updated_card[8],
-                'photo_url': updated_card[9]
+                'photo_url': updated_card[9],
+                'logo_url': updated_card[10]
             }
         }),
         'isBase64Encoded': False

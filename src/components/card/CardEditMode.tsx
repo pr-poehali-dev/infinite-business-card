@@ -1,9 +1,11 @@
+import { useState, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
 import Logo from '@/components/Logo';
+import { toast } from 'sonner';
 
 interface CardData {
   id: number;
@@ -27,6 +29,59 @@ interface CardEditModeProps {
 }
 
 const CardEditMode = ({ editForm, saving, onEditFormChange, onSave, onCancel }: CardEditModeProps) => {
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Выберите изображение');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Файл слишком большой (макс. 5 МБ)');
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      
+      reader.onload = async () => {
+        const base64 = (reader.result as string).split(',')[1];
+        
+        const response = await fetch('https://functions.poehali.dev/50fdddd4-e611-4c44-a602-fc0d45e26445', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image: base64,
+            content_type: file.type
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Ошибка загрузки');
+        }
+
+        const data = await response.json();
+        onEditFormChange('logo_url', data.url);
+        toast.success('Фото загружено!');
+      };
+    } catch (error) {
+      toast.error('Не удалось загрузить фото');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   return (
     <>
       {/* Header */}
@@ -72,20 +127,54 @@ const CardEditMode = ({ editForm, saving, onEditFormChange, onSave, onCancel }: 
           <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-gold via-yellow-400 to-gold"></div>
           
           <div className="p-8 pt-10">
-            {/* Logo / Avatar */}
-            {editForm.logo_url ? (
-              <div className="mb-6 flex justify-center">
-                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gold/20 shadow-lg">
-                  <img src={editForm.logo_url} alt={editForm.name} className="w-full h-full object-cover" />
-                </div>
+            {/* Logo / Avatar with Upload */}
+            <div className="mb-6 flex flex-col items-center gap-3">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+              
+              <div 
+                onClick={handleImageClick}
+                className="relative cursor-pointer group"
+              >
+                {editForm.logo_url ? (
+                  <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gold/20 shadow-lg">
+                    <img src={editForm.logo_url} alt={editForm.name} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      {uploadingImage ? (
+                        <Icon name="Loader2" size={32} className="text-white animate-spin" />
+                      ) : (
+                        <Icon name="Camera" size={32} className="text-white" />
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-32 h-32 rounded-full bg-gradient-to-br from-gold/20 to-gold/5 flex items-center justify-center border-4 border-gold/20 shadow-lg group-hover:border-gold/40 transition-colors">
+                    {uploadingImage ? (
+                      <Icon name="Loader2" size={48} className="text-gold/60 animate-spin" />
+                    ) : (
+                      <Icon name="Camera" size={48} className="text-gold/60" />
+                    )}
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="mb-6 flex justify-center">
-                <div className="w-32 h-32 rounded-full bg-gradient-to-br from-gold/20 to-gold/5 flex items-center justify-center border-4 border-gold/20 shadow-lg">
-                  <Icon name="User" size={48} className="text-gold/60" />
-                </div>
-              </div>
-            )}
+              
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleImageClick}
+                disabled={uploadingImage}
+                className="text-xs"
+              >
+                <Icon name="Upload" size={14} className="mr-1" />
+                {uploadingImage ? 'Загрузка...' : 'Загрузить фото'}
+              </Button>
+            </div>
 
             {/* Edit Form */}
             <div className="space-y-4">
