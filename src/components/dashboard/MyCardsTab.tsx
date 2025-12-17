@@ -27,6 +27,8 @@ const MyCardsTab = () => {
   const [cards, setCards] = useState<CardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [cardToDelete, setCardToDelete] = useState<CardData | null>(null);
   const [newCard, setNewCard] = useState({
     name: '',
     position: '',
@@ -37,6 +39,7 @@ const MyCardsTab = () => {
     description: ''
   });
   const [creating, setCreating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     loadCards();
@@ -114,6 +117,41 @@ const MyCardsTab = () => {
 
   const openCard = (slug: string) => {
     window.open(`/card/${slug}`, '_blank');
+  };
+
+  const handleDeleteClick = (card: CardData) => {
+    setCardToDelete(card);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!cardToDelete) return;
+
+    setDeleting(true);
+    try {
+      const authToken = localStorage.getItem('auth_token');
+      const response = await fetch('https://functions.poehali.dev/687d39ad-03bb-4587-a6f7-8eece4855a60', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Auth-Token': authToken || ''
+        },
+        body: JSON.stringify({ slug: cardToDelete.slug })
+      });
+
+      if (response.ok) {
+        toast.success('Визитка удалена');
+        setDeleteDialogOpen(false);
+        setCardToDelete(null);
+        loadCards();
+      } else {
+        throw new Error('Failed to delete');
+      }
+    } catch (error) {
+      toast.error('Не удалось удалить визитку');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   if (loading) {
@@ -206,6 +244,15 @@ const MyCardsTab = () => {
                   >
                     <Icon name="Copy" size={14} className="mr-2" />
                     Скопировать ссылку
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDeleteClick(card)}
+                    className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
+                  >
+                    <Icon name="Trash2" size={14} className="mr-2" />
+                    Удалить
                   </Button>
                 </div>
               </CardContent>
@@ -320,6 +367,48 @@ const MyCardsTab = () => {
                 )}
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Удалить визитку?</DialogTitle>
+            <DialogDescription>
+              Вы уверены, что хотите удалить визитку <strong>{cardToDelete?.name}</strong>?
+              Это действие необратимо.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex gap-3 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={deleting}
+              className="flex-1"
+            >
+              Отмена
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={deleting}
+              className="flex-1"
+            >
+              {deleting ? (
+                <>
+                  <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
+                  Удаление...
+                </>
+              ) : (
+                <>
+                  <Icon name="Trash2" size={18} className="mr-2" />
+                  Удалить
+                </>
+              )}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
