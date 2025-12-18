@@ -17,6 +17,7 @@ import TestAI from "./pages/TestAI";
 import VKCallback from "./pages/VKCallback";
 import VKDiagnostics from "./pages/VKDiagnostics";
 import GoogleCallback from "./pages/GoogleCallback";
+import YandexCallback from "./pages/YandexCallback";
 import NotFound from "./pages/NotFound";
 
 const future = {
@@ -45,6 +46,7 @@ const App = () => (
                 <Route path="/test-ai" element={<TestAI />} />
                 <Route path="/auth/vk" element={<VKCallback />} />
                 <Route path="/auth/google" element={<GoogleCallback />} />
+                <Route path="/auth/yandex" element={<YandexCallback />} />
                 <Route path="/vk-diagnostics" element={<VKDiagnostics />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />

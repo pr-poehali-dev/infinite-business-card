@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -169,6 +169,28 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
     }
   };
 
+  const handleYandexAuth = async () => {
+    try {
+      const redirectUri = window.location.origin + '/auth/yandex';
+      const response = await fetch(`https://functions.poehali.dev/6fc83860-fe65-4faa-9951-577ec8b00f94?action=login&redirect_uri=${encodeURIComponent(redirectUri)}`);
+      
+      if (!response.ok) {
+        throw new Error('Ошибка подключения к Яндекс');
+      }
+      
+      const data = await response.json();
+      if (data.auth_url) {
+        window.location.href = data.auth_url;
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Ошибка',
+        description: error.message || 'Не удалось подключиться к Яндекс',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const handleTelegramAuth = (userData: any) => {
     fetch('https://functions.poehali.dev/1f1f10e9-7be0-4c16-91b6-f53673e8b2ea', {
       method: 'POST',
@@ -186,6 +208,7 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
         });
         onSuccess();
         onOpenChange(false);
+        window.location.reload();
       }
     })
     .catch(error => {
@@ -196,6 +219,25 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
       });
     });
   };
+
+  useEffect(() => {
+    if (open && typeof window !== 'undefined' && (window as any).Telegram) {
+      const container = document.getElementById('telegram-login-container');
+      if (container && !container.hasChildNodes()) {
+        const script = document.createElement('script');
+        script.src = 'https://telegram.org/js/telegram-widget.js?22';
+        script.setAttribute('data-telegram-login', 'YOUR_BOT_USERNAME');
+        script.setAttribute('data-size', 'large');
+        script.setAttribute('data-radius', '8');
+        script.setAttribute('data-onauth', 'handleTelegramAuth(user)');
+        script.setAttribute('data-request-access', 'write');
+        script.async = true;
+        container.appendChild(script);
+        
+        (window as any).handleTelegramAuth = handleTelegramAuth;
+      }
+    }
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -310,7 +352,7 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
                 type="button"
                 variant="outline"
                 className="w-full border-[#FFCC00] text-black hover:bg-[#FFCC00] hover:text-black transition-colors"
-                onClick={() => toast({ title: 'Скоро', description: 'Авторизация через Яндекс будет доступна позже' })}
+                onClick={handleYandexAuth}
               >
                 <svg className="mr-2" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm3.9 18.4h-2.6V9.2c0-1.5-.7-2.3-1.9-2.3-1 0-1.7.6-2.1 1.5v9.9H6.8V5.6h2.5v1.5c.7-1 1.8-1.7 3.2-1.7 2.3 0 3.8 1.5 3.8 4.2v8.8z"/>
@@ -318,17 +360,7 @@ const AuthDialog = ({ open, onOpenChange, onSuccess }: AuthDialogProps) => {
                 Войти через Яндекс
               </Button>
 
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full border-[#229ED9] text-[#229ED9] hover:bg-[#229ED9] hover:text-white transition-colors"
-                onClick={() => toast({ title: 'Telegram Widget', description: 'Для входа через Telegram нужно добавить виджет на сайт. Пока используйте другие методы.' })}
-              >
-                <svg className="mr-2" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/>
-                </svg>
-                Войти через Telegram
-              </Button>
+              <div id="telegram-login-container" className="flex justify-center py-2" />
 
               <Button
                 type="button"
