@@ -21,6 +21,7 @@ const PaymentError = lazy(() => import("./pages/PaymentError"));
 const YooKassaSetup = lazy(() => import("./pages/YooKassaSetup"));
 const TestAI = lazy(() => import("./pages/TestAI"));
 const VKCallback = lazy(() => import("./pages/VKCallback"));
+const VKDiagnostics = lazy(() => import("./pages/VKDiagnostics"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -43,6 +44,7 @@ const App = () => (
                 <Route path="/yookassa-setup" element={<YooKassaSetup />} />
                 <Route path="/test-ai" element={<TestAI />} />
                 <Route path="/auth/vk" element={<VKCallback />} />
+                <Route path="/vk-diagnostics" element={<VKDiagnostics />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
