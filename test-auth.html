@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест авторизации - visitka.site</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 { 
+            text-align: center;
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 28px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .btn-email {
+            background: #667eea;
+            color: white;
+        }
+        .btn-vk {
+            background: #0077FF;
+            color: white;
+        }
+        .btn-google {
+            background: #DB4437;
+            color: white;
+        }
+        .btn-yandex {
+            background: #FFCC00;
+            color: #000;
+        }
+        .btn-telegram {
+            background: #0088CC;
+            color: white;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.show { display: block; }
+        .divider {
+            text-align: center;
+            margin: 25px 0;
+            position: relative;
+        }
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e0e0e0;
+        }
+        .divider span {
+            background: white;
+            padding: 0 15px;
+            position: relative;
+            color: #999;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Тест авторизации</h1>
+        <p class="subtitle">visitka.site</p>
+
+        <!-- Email регистрация -->
+        <div class="section">
+            <div class="section-title">📧 Email / Пароль</div>
+            <form id="emailForm">
+                <div class="input-group">
+                    <label>Имя</label>
+                    <input type="text" id="name" placeholder="Иван Иванов" required>
+                </div>
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" id="email" placeholder="test@example.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Пароль</label>
+                    <input type="password" id="password" placeholder="минимум 6 символов" required>
+                </div>
+                <button type="submit" class="btn btn-email">Зарегистрироваться</button>
+            </form>
+        </div>
+
+        <div class="divider"><span>или войти через</span></div>
+
+        <!-- OAuth кнопки -->
+        <div class="section">
+            <div class="section-title">🔐 Социальные сети</div>
+            <button class="btn btn-vk" onclick="testVK()">
+                <span>ВКонтакте</span>
+            </button>
+            <button class="btn btn-google" onclick="testGoogle()">
+                <span>Google</span>
+            </button>
+            <button class="btn btn-yandex" onclick="testYandex()">
+                <span>Яндекс</span>
+            </button>
+            <button class="btn btn-telegram" onclick="testTelegram()">
+                <span>Telegram</span>
+            </button>
+        </div>
+
+        <!-- Статус -->
+        <div class="status" id="status"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://functions.poehali.dev';
+        const REDIRECT_BASE = window.location.origin;
+
+        function showStatus(message, isError = false) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status show ' + (isError ? 'error' : 'success');
+            setTimeout(() => {
+                status.classList.remove('show');
+            }, 5000);
+        }
+
+        // Email регистрация
+        document.getElementById('emailForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(API_BASE + '/063b09be-f07e-478c-a626-807980d111e1', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'register',
+                        name: name,
+                        email: email,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showStatus(`✅ Регистрация успешна! Token: ${data.token.substring(0, 20)}...`);
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                } else {
+                    showStatus(`❌ Ошибка: ${data.error}`, true);
+                }
+            } catch (error) {
+                showStatus(`❌ Сетевая ошибка: ${error.message}`, true);
+            }
+        });
+
+        // VK авторизация
+        async function testVK() {
+            try {
+                const redirectUri = REDIRECT_BASE + '/auth/vk';
+                const response = await fetch(API_BASE + '/74d0ac96-7cc9-4254-86f4-508ca9a70f55?redirect_uri=' + encodeURIComponent(redirectUri));
+                const data = await response.json();
+
+                if (data.auth_url) {
+                    showStatus('🚀 Перенаправляем на VK...');
+                    setTimeout(() => {
+                        window.location.href = data.auth_url;
+                    }, 1000);
+                } else {
+                    showStatus('❌ Не получен URL от VK', true);
+                }
+            } catch (error) {
+                showStatus(`❌ VK ошибка: ${error.message}`, true);
+            }
+        }
+
+        // Google авторизация
+        async function testGoogle() {
+            try {
+                const redirectUri = REDIRECT_BASE + '/auth/google';
+                const response = await fetch(API_BASE + '/2faff2e2-9012-406b-bd38-07f4be72099b?action=login&redirect_uri=' + encodeURIComponent(redirectUri));
+                const data = await response.json();
+
+                if (data.auth_url) {
+                    showStatus('🚀 Перенаправляем на Google...');
+                    setTimeout(() => {
+                        window.location.href = data.auth_url;
+                    }, 1000);
+                } else {
+                    showStatus('❌ Не получен URL от Google', true);
+                }
+            } catch (error) {
+                showStatus(`❌ Google ошибка: ${error.message}`, true);
+            }
+        }
+
+        // Яндекс авторизация
+        async function testYandex() {
+            try {
+                const redirectUri = REDIRECT_BASE + '/auth/yandex';
+                const response = await fetch(API_BASE + '/6fc83860-fe65-4faa-9951-577ec8b00f94?action=login&redirect_uri=' + encodeURIComponent(redirectUri));
+                const data = await response.json();
+
+                if (data.auth_url) {
+                    showStatus('🚀 Перенаправляем на Яндекс...');
+                    setTimeout(() => {
+                        window.location.href = data.auth_url;
+                    }, 1000);
+                } else {
+                    showStatus('❌ Не получен URL от Яндекс', true);
+                }
+            } catch (error) {
+                showStatus(`❌ Яндекс ошибка: ${error.message}`, true);
+            }
+        }
+
+        // Telegram авторизация
+        function testTelegram() {
+            showStatus('⚠️ Telegram требует настройки бота через @BotFather', true);
+        }
+
+        // Проверка сохраненного токена
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                showStatus(`✅ Вы уже вошли как: ${user.name || user.email}`);
+            }
+        });
+    </script>
+</body>
+</html>
