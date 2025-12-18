@@ -293,13 +293,16 @@ def handler(event, context):
             'isBase64Encoded': False
         }
     
-    except Exception:
+    except Exception as e:
+        print(f'ERROR: {type(e).__name__}: {str(e)}')
+        import traceback
+        print(traceback.format_exc())
         if conn:
             conn.rollback()
         return {
             'statusCode': 500,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'Authentication failed'}),
+            'body': json.dumps({'error': f'Authentication failed: {str(e)}'}),
             'isBase64Encoded': False
         }
     
