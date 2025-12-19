@@ -117,9 +117,12 @@ const MyCardsTab = () => {
         });
         loadCards();
       } else {
-        throw new Error('Failed to create');
+        const errorData = await response.json();
+        console.error('Create card error:', errorData);
+        throw new Error(errorData.error || 'Failed to create');
       }
     } catch (error) {
+      console.error('Create card exception:', error);
       toast.error('Не удалось создать визитку');
     } finally {
       setCreating(false);
